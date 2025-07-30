@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Keterangan Pedukuhan Ngulakan</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .form-row label {
+            min-width: 150px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .form-row input, .form-row select, .form-row textarea {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-group label {
+            min-width: auto;
+            margin-right: 5px;
+            font-weight: normal;
+        }
+        
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Print styles */
+        .surat {
+            display: none;
+            font-family: 'Times New Roman', serif;
+            font-size: 12px;
+            line-height: 1.4;
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 0 auto;
+            padding: 2.5cm 2cm 2cm 2cm;
+            background: white;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid black;
+            padding-bottom: 8px;
+        }
+        
+        .header h2 {
+            margin: 3px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .header h3 {
+            margin: 3px 0;
+            font-size: 11px;
+            font-weight: normal;
+        }
+        
+        .title {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .title h1 {
+            font-size: 16px;
+            text-decoration: underline;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .title p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        .content {
+            margin: 15px 0;
+        }
+        
+        .content p {
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        
+        .data-row {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        
+        .data-row .label {
+            width: 160px;
+            display: inline-block;
+        }
+        
+        .data-row .colon {
+            width: 15px;
+            display: inline-block;
+        }
+        
+        .data-row .value {
+            flex: 1;
+            border-bottom: 1px dotted black;
+            min-height: 18px;
+            padding-bottom: 2px;
+        }
+        
+        .keperluan {
+            margin: 15px 0;
+        }
+        
+        .keperluan p {
+            margin: 8px 0;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .keperluan-item {
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .signature {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .signature-left, .signature-right {
+            width: 45%;
+            text-align: center;
+        }
+        
+        .signature p {
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        
+        .signature-space {
+            height: 60px;
+            margin: 10px 0;
+        }
+        
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container, .form-section, .buttons {
+                display: none !important;
+            }
+            
+            .surat {
+                display: block !important;
+                width: 21cm;
+                min-height: 29.7cm;
+                margin: 0;
+                padding: 2.5cm 2cm 2cm 2cm;
+                font-size: 12px;
+            }
+            
+            #backButton {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px;">Form Pengisian Surat Keterangan</h2>
+        
+        <div class="form-section">
+            <h3>Data Pemohon</h3>
+            
+            <div class="form-row">
+                <label>Nomor Surat:</label>
+                <input type="text" id="nomorSurat" placeholder="Contoh: 001/Ngl./VII/2024">
+            </div>
+            
+            <div class="form-row">
+                <label>Nama Lengkap:</label>
+                <input type="text" id="nama" placeholder="Nama lengkap pemohon">
+            </div>
+            
+            <div class="form-row">
+                <label>Jenis Kelamin:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="jenisKelamin" value="Laki-laki"> Laki-laki</label>
+                    <label><input type="radio" name="jenisKelamin" value="Perempuan"> Perempuan</label>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <label>Tempat/Tgl Lahir:</label>
+                <input type="text" id="tempatTanggalLahir" placeholder="Contoh: Yogyakarta, 15 Januari 1990">
+            </div>
+            
+            <div class="form-row">
+                <label>Status Perkawinan:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="statusKawin" value="Kawin"> Kawin</label>
+                    <label><input type="radio" name="statusKawin" value="Belum Kawin"> Belum Kawin</label>
+                    <label><input type="radio" name="statusKawin" value="Janda"> Janda</label>
+                    <label><input type="radio" name="statusKawin" value="Duda"> Duda</label>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <label>Agama:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="agama" value="Islam"> Islam</label>
+                    <label><input type="radio" name="agama" value="Kristen"> Kristen</label>
+                    <label><input type="radio" name="agama" value="Katholik"> Katholik</label>
+                    <label><input type="radio" name="agama" value="Hindu"> Hindu</label>
+                    <label><input type="radio" name="agama" value="Budha"> Budha</label>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <label>Pekerjaan:</label>
+                <input type="text" id="pekerjaan" placeholder="Contoh: Petani, Wiraswasta, PNS">
+            </div>
+            
+            <div class="form-row">
+                <label>NIK:</label>
+                <input type="text" id="nik" placeholder="Nomor Induk Kependudukan">
+            </div>
+            
+            <div class="form-row">
+                <label>RT:</label>
+                <input type="text" id="rt" placeholder="Contoh: 001">
+            </div>
+            
+            <div class="form-row">
+                <label>RW:</label>
+                <input type="text" id="rw" placeholder="Contoh: 001">
+            </div>
+            
+            <div class="form-row">
+                <label>Ketua RT:</label>
+                <input type="text" id="ketuaRt" placeholder="Nama Ketua RT">
+            </div>
+            
+            <div class="form-row">
+                <label>Ketua RW:</label>
+                <input type="text" id="ketuaRw" placeholder="Nama Ketua RW">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Keperluan</h3>
+            
+            <div class="form-row">
+                <label>Keperluan a:</label>
+                <input type="text" id="keperluanA" placeholder="Keperluan pertama">
+            </div>
+            
+            <div class="form-row">
+                <label>Keperluan b:</label>
+                <input type="text" id="keperluanB" placeholder="Keperluan kedua">
+            </div>
+            
+            <div class="form-row">
+                <label>Keperluan c:</label>
+                <input type="text" id="keperluanC" placeholder="Keperluan ketiga">
+            </div>
+            
+            <div class="form-row">
+                <label>Keperluan d:</label>
+                <input type="text" id="keperluanD" placeholder="Keperluan keempat">
+            </div>
+            
+            <div class="form-row">
+                <label>Keterangan:</label>
+                <textarea id="keterangan" rows="3" placeholder="Keterangan tambahan jika diperlukan"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <label>Tanggal:</label>
+                <input type="date" id="tanggal">
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="previewSurat()">Preview Surat</button>
+            <button class="btn btn-success" onclick="printSurat()">Print/Export PDF</button>
+            <button class="btn" style="background-color: #17a2b8; color: white;" onclick="isiContohData()">Isi Contoh Data</button>
+        </div>
+    </div>
+
+    <!-- Surat Template -->
+    <div class="surat" id="suratTemplate">
+        <div class="header">
+            <h2>PEMERINTAH DESA HARGOREJO</h2>
+            <h2>PEDUKUHAN NGULAKAN</h2>
+            <h3>Alamat : Ngulakan, Hargorejo, Kokap, Kulon Progo, DIY</h3>
+        </div>
+        
+        <div class="title">
+            <h1>SURAT KETERANGAN</h1>
+            <p>NOMOR : <span id="displayNomor"></span></p>
+        </div>
+        
+        <div class="content">
+            <p>Yang bertanda tangan dibawah ini Dukuh Pedukuhan Ngulakan</p>
+            <p><strong>Menerangkan bahwa :</strong></p>
+            
+            <div class="data-row">
+                <span class="label">Nama</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayNama"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Jenis Kelamin</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayJenisKelamin"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Tempat/Tgl Lahir</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayTempatTanggalLahir"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Status Perkawinan</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayStatusKawin"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Agama</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayAgama"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Pekerjaan</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayPekerjaan"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">No C1 / KK</span>
+                <span class="colon">:</span>
+                <span class="value">340108</span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">NIK</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayNik"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Alamat</span>
+                <span class="colon">:</span>
+                <span class="value">Rt:<span id="displayRt"></span> Rw:<span id="displayRw"></span>, Pedukuhan Ngulakan<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Desa Hargorejo, Kecamatan Kokap,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kab. Kulon Progo, DIY</span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Ketua Rt</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayKetuaRt"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Ketua Rw</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayKetuaRw"></span>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Pergi ke</span>
+                <span class="colon">:</span>
+                <span class="value">Kantor Desa Hargorejo</span>
+            </div>
+            
+            <div class="keperluan">
+                <p><strong>Keperluan :</strong></p>
+                <div class="keperluan-item">a. <span id="displayKeperluanA"></span></div>
+                <div class="keperluan-item">b. <span id="displayKeperluanB"></span></div>
+                <div class="keperluan-item">c. <span id="displayKeperluanC"></span></div>
+                <div class="keperluan-item">d. <span id="displayKeperluanD"></span></div>
+            </div>
+            
+            <div class="data-row">
+                <span class="label">Keterangan</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayKeterangan"></span>
+            </div>
+        </div>
+        
+        <div class="signature">
+            <div class="signature-left">
+                <p>Pemegang Surat</p>
+                <div class="signature-space"></div>
+                <p id="displayNamaSignature"></p>
+            </div>
+            <div class="signature-right">
+                <p>Ngulakan, <span id="displayTanggal"></span></p>
+                <p>Dukuh Ngulakan</p>
+                <div class="signature-space"></div>
+                <p><strong>ULIN NUHA</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set tanggal hari ini sebagai default
+        document.getElementById('tanggal').valueAsDate = new Date();
+        
+        function getRadioValue(name) {
+            const radio = document.querySelector(`input[name="${name}"]:checked`);
+            return radio ? radio.value : '';
+        }
+        
+        function formatTanggal(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+        
+        function previewSurat() {
+            // Ambil semua data dari form
+            document.getElementById('displayNomor').textContent = document.getElementById('nomorSurat').value;
+            document.getElementById('displayNama').textContent = document.getElementById('nama').value;
+            document.getElementById('displayJenisKelamin').textContent = getRadioValue('jenisKelamin');
+            document.getElementById('displayTempatTanggalLahir').textContent = document.getElementById('tempatTanggalLahir').value;
+            document.getElementById('displayStatusKawin').textContent = getRadioValue('statusKawin');
+            document.getElementById('displayAgama').textContent = getRadioValue('agama');
+            document.getElementById('displayPekerjaan').textContent = document.getElementById('pekerjaan').value;
+            document.getElementById('displayNik').textContent = document.getElementById('nik').value;
+            document.getElementById('displayRt').textContent = document.getElementById('rt').value;
+            document.getElementById('displayRw').textContent = document.getElementById('rw').value;
+            document.getElementById('displayKetuaRt').textContent = document.getElementById('ketuaRt').value;
+            document.getElementById('displayKetuaRw').textContent = document.getElementById('ketuaRw').value;
+            document.getElementById('displayKeperluanA').textContent = document.getElementById('keperluanA').value;
+            document.getElementById('displayKeperluanB').textContent = document.getElementById('keperluanB').value;
+            document.getElementById('displayKeperluanC').textContent = document.getElementById('keperluanC').value;
+            document.getElementById('displayKeperluanD').textContent = document.getElementById('keperluanD').value;
+            document.getElementById('displayKeterangan').textContent = document.getElementById('keterangan').value;
+            document.getElementById('displayTanggal').textContent = formatTanggal(document.getElementById('tanggal').value);
+            document.getElementById('displayNamaSignature').textContent = document.getElementById('nama').value;
+            
+            // Sembunyikan form dan tampilkan surat
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('suratTemplate').style.display = 'block';
+            
+            // Tambahkan tombol kembali
+            if (!document.getElementById('backButton')) {
+                const backButton = document.createElement('button');
+                backButton.id = 'backButton';
+                backButton.textContent = 'Kembali ke Form';
+                backButton.className = 'btn btn-primary';
+                backButton.style.position = 'fixed';
+                backButton.style.top = '20px';
+                backButton.style.right = '20px';
+                backButton.style.zIndex = '1000';
+                backButton.onclick = function() {
+                    document.querySelector('.container').style.display = 'block';
+                    document.getElementById('suratTemplate').style.display = 'none';
+                    this.remove();
+                };
+                document.body.appendChild(backButton);
+            }
+        }
+        
+        function printSurat() {
+            previewSurat();
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        function isiContohData() {
+            // Data pribadi
+            document.getElementById('nomorSurat').value = '015/Ngl./VII/2024';
+            document.getElementById('nama').value = 'Siti Rahayu';
+            document.querySelector('input[name="jenisKelamin"][value="Perempuan"]').checked = true;
+            document.getElementById('tempatTanggalLahir').value = 'Kulon Progo, 12 Agustus 1988';
+            document.querySelector('input[name="statusKawin"][value="Kawin"]').checked = true;
+            document.querySelector('input[name="agama"][value="Islam"]').checked = true;
+            document.getElementById('pekerjaan').value = 'Ibu Rumah Tangga';
+            document.getElementById('nik').value = '3402015208880002';
+            
+            // Alamat
+            document.getElementById('rt').value = '003';
+            document.getElementById('rw').value = '002';
+            document.getElementById('ketuaRt').value = 'Bapak Sutrisno';
+            document.getElementById('ketuaRw').value = 'Bapak Widodo';
+            
+            // Keperluan
+            document.getElementById('keperluanA').value = 'Mengurus Kartu Keluarga (KK)';
+            document.getElementById('keperluanB').value = 'Pendaftaran anak sekolah';
+            document.getElementById('keperluanC').value = 'Syarat administrasi kependudukan';
+            document.getElementById('keperluanD').value = 'Keperluan lain-lain';
+            
+            // Keterangan dan tanggal
+            document.getElementById('keterangan').value = 'Yang bersangkutan adalah warga yang baik dan tidak pernah terlibat masalah hukum. Surat keterangan ini dibuat untuk keperluan administrasi.';
+            
+            // Set tanggal hari ini jika belum ada
+            if (!document.getElementById('tanggal').value) {
+                document.getElementById('tanggal').valueAsDate = new Date();
+            }
+            
+            alert('Contoh data telah diisi! Anda bisa mengedit sesuai kebutuhan.');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Kegiatan Desa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function formatTanggalIndonesia(tanggal) {
+            if (!tanggal) return '';
+            const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulan = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            const date = new Date(tanggal);
+            const namaHari = hari[date.getDay()];
+            const tanggalNum = date.getDate();
+            const namaBulan = bulan[date.getMonth()];
+            const tahun = date.getFullYear();
+            return `${namaHari}, ${tanggalNum} ${namaBulan} ${tahun}`;
+        }
+
+        function filterTabel() {
+            const nama = document.getElementById('filterNama').value.toLowerCase();
+            const alamat = document.getElementById('filterAlamat').value.toLowerCase();
+            const tanggal = document.getElementById('filterTanggal').value;
+            const jam = document.getElementById('filterJam').value.toLowerCase();
+            const kategori = document.getElementById('filterKategori').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#tabelKegiatan tbody tr');
+            rows.forEach(row => {
+                const namaText = row.querySelector('[data-nama]').textContent.toLowerCase();
+                const alamatText = row.querySelector('[data-alamat]').textContent.toLowerCase();
+                const tanggalVal = row.querySelector('[data-tanggal]').getAttribute('data-tanggal');
+                const jamText = row.querySelector('[data-jam]').textContent.toLowerCase();
+                const kategoriText = row.querySelector('[data-kategori]').textContent.toLowerCase();
+                const statusText = row.querySelector('[data-status]').textContent.toLowerCase();
+
+                const cocok =
+                    namaText.includes(nama) &&
+                    alamatText.includes(alamat) &&
+                    (tanggal === '' || tanggalVal === tanggal) &&
+                    jamText.includes(jam) &&
+                    (kategori === 'semua' || kategoriText === kategori) &&
+                    (status === 'semua' || statusText === status);
+
+                row.style.display = cocok ? '' : 'none';
+            });
+        }
+
+        function resetFilter() {
+            document.getElementById('filterNama').value = '';
+            document.getElementById('filterAlamat').value = '';
+            document.getElementById('filterTanggal').value = '';
+            document.getElementById('filterJam').value = '';
+            document.getElementById('filterKategori').value = 'semua';
+            document.getElementById('filterStatus').value = 'semua';
+            filterTabel();
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Daftar Kegiatan Desa</h2>
+            <a href="/admin/kegiatan/tambah" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Tambah Kegiatan</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="filterNama" oninput="filterTabel()" placeholder="Cari Nama" class="border px-3 py-2 rounded" />
+            <input type="text" id="filterAlamat" oninput="filterTabel()" placeholder="Cari Alamat" class="border px-3 py-2 rounded" />
+            <input type="date" id="filterTanggal" onchange="filterTabel()" class="border px-3 py-2 rounded" />
+<input type="time" id="filterJam" onchange="filterTabel()" class="border px-3 py-2 rounded" />
+            <select id="filterKategori" onchange="filterTabel()" class="border px-3 py-2 rounded">
+                <option value="semua">Semua Kategori</option>
+                <option value="sosial">Sosial</option>
+                <option value="budaya">Budaya</option>
+                <option value="keagamaan">Keagamaan</option>
+                <option value="pendidikan">Pendidikan</option>
+                <option value="kesehatan">Kesehatan</option>
+                <option value="olahraga">Olahraga</option>
+            </select>
+            <select id="filterStatus" onchange="filterTabel()" class="border px-3 py-2 rounded">
+                <option value="semua">Semua Status</option>
+                <option value="direncanakan">Direncanakan</option>
+                <option value="berlangsung">Berlangsung</option>
+                <option value="selesai">Selesai</option>
+                <option value="dibatalkan">Dibatalkan</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <button onclick="resetFilter()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Reset Filter</button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table id="tabelKegiatan" class="min-w-full table-auto border text-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="px-3 py-2 border">Nama</th>
+                        <th class="px-3 py-2 border">Tanggal</th>
+                        <th class="px-3 py-2 border">Jam</th>
+                        <th class="px-3 py-2 border">Alamat</th>
+                        <th class="px-3 py-2 border">Kategori</th>
+                        <th class="px-3 py-2 border">Status</th>
+                        <th class="px-3 py-2 border">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (kegiatan.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="px-3 py-4 text-center text-gray-500">Belum ada kegiatan yang terdaftar.</td>
+                        </tr>
+                    <% } else { %>
+                        <% kegiatan.forEach(item => { %>
+                        <tr>
+                            <td class="px-3 py-2 border" data-nama>
+                                <a href="/admin/kegiatan/<%= item.id_kegiatan_desa %>" class="text-blue-600 hover:underline">
+                                    <%= item.nama_kegiatan %>
+                                </a>
+                            </td>
+                            <td class="px-3 py-2 border" data-tanggal="<%= item.tanggal_kegiatan.toISOString().split('T')[0] %>">
+                                <script>
+                                    document.write(formatTanggalIndonesia('<%= item.tanggal_kegiatan.toISOString() %>'));
+                                </script>
+                            </td>
+                            <td class="px-3 py-2 border" data-jam>
+                                <%= item.jam_kegiatan ? item.jam_kegiatan.slice(0,5) : '-' %>
+                            </td>
+                            <td class="px-3 py-2 border" data-alamat><%= item.alamat_kegiatan %></td>
+                            <td class="px-3 py-2 border" data-kategori><%= item.kategori_kegiatan %></td>
+                            <td class="px-3 py-2 border" data-status><%= item.status_kegiatan || 'Direncanakan' %></td>
+                            <td class="px-3 py-2 border">
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="/admin/kegiatan/edit/<%= item.id_kegiatan_desa %>" class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500">Edit</a>
+                                    <form action="/admin/kegiatan/hapus/<%= item.id_kegiatan_desa %>" method="POST" onsubmit="return confirm('Yakin ingin menghapus kegiatan ini?')">
+                                        <button type="submit" class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

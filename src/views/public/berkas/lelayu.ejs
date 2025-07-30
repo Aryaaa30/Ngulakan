@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawartos Lelayu (Berita Duka)</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .form-row label {
+            min-width: 180px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .form-row input, .form-row select, .form-row textarea {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-group label {
+            min-width: auto;
+            margin-right: 5px;
+            font-weight: normal;
+        }
+        
+        .keluarga-section {
+            margin-top: 20px;
+        }
+        
+        .keluarga-item {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .keluarga-item label {
+            min-width: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* Print styles */
+        .surat {
+            display: none;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            width: 210mm;              /* Lebar A4 */
+            min-height: 297mm;         /* Tinggi minimum A4 */
+            margin: 0 auto;
+            padding: 1.5cm 1.5cm 1.5cm 1.5cm;
+            background: white;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        .content {
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+        
+        .content p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+        
+        .data-line {
+            margin: 8px 0;
+            display: flex;
+            align-items: baseline;
+        }
+        
+        .data-line .label {
+            min-width: 200px;
+            display: inline-block;
+        }
+        
+        .data-line .colon {
+            width: 20px;
+            display: inline-block;
+        }
+        
+        .data-line .value {
+            flex: 1;
+            border-bottom: 1px dotted black;
+            min-height: 20px;
+            padding-bottom: 2px;
+        }
+        
+        .alamat-section {
+            margin: 15px 0;
+        }
+        
+        .pemakaman-section {
+            margin: 20px 0;
+        }
+        
+        .keluarga-duka {
+            margin: 20px 0;
+        }
+        
+        .keluarga-list {
+            margin-left: 0;
+            padding-left: 0;
+        }
+        
+        .keluarga-list li {
+            list-style: none;
+            margin: 5px 0;
+            border-bottom: 1px dotted black;
+            min-height: 20px;
+            padding-bottom: 2px;
+        }
+        
+        .closing {
+            margin: 20px 0;
+        }
+        
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .container, .form-section, .buttons {
+                display: none !important;
+            }
+
+            .surat {
+                display: block !important;
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                padding: 1.5cm 1,5cm 1,5cm 1,5cm;
+                font-size: 12pt;
+                box-sizing: border-box;
+                page-break-after: avoid;
+            }
+
+            #backButton {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px;">Form Pawartos Lelayu (Berita Duka)</h2>
+        
+        <div class="form-section">
+            <h3>Data Tujuan</h3>
+            
+            <div class="form-row">
+                <label>Katur (Kepada):</label>
+                <input type="text" id="tujuan" placeholder="Contoh: Pedukuhan Ngulakan / Masjid Al-Ikhlas">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Data Almarhum/Almarhumah</h3>
+            
+            <div class="form-row">
+                <label>Nama Almarhum/Almarhumah:</label>
+                <input type="text" id="namaAlmarhum" placeholder="Nama lengkap almarhum/almarhumah">
+            </div>
+            
+            <div class="form-row">
+                <label>RT:</label>
+                <input type="text" id="rt" placeholder="Contoh: 003" maxlength="3">
+            </div>
+            
+            <div class="form-row">
+                <label>RW:</label>
+                <input type="text" id="rw" placeholder="Contoh: 002" maxlength="3">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Data Kematian</h3>
+            
+            <div class="form-row">
+                <label>Tanggal Meninggal:</label>
+                <input type="date" id="tanggalMeninggal">
+            </div>
+            
+            <div class="form-row">
+                <label>Jam Meninggal:</label>
+                <input type="time" id="jamMeninggal">
+            </div>
+            
+            <div class="form-row">
+                <label>Usia (Yuswo):</label>
+                <input type="text" id="usia" placeholder="Contoh: 65 tahun">
+            </div>
+            
+            <div class="form-row">
+                <label>Sebab Meninggal:</label>
+                <input type="text" id="sebabMeninggal" placeholder="Contoh: Sakit / Usia lanjut / dll">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Data Pemakaman</h3>
+            
+            <div class="form-row">
+                <label>Hari Pemakaman:</label>
+                <input type="text" id="hariPemakaman" placeholder="Contoh: Senin, 29 Juli 2024">
+            </div>
+            
+            <div class="form-row">
+                <label>Jam Pemakaman:</label>
+                <input type="time" id="jamPemakaman">
+            </div>
+            
+            <div class="form-row">
+                <label>Tempat Pemakaman:</label>
+                <input type="text" id="tempatPemakaman" placeholder="Contoh: Makam Ngulakan / TPU Hargorejo">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Keluarga Duka</h3>
+            <div class="keluarga-section">
+                <div class="keluarga-item">
+                    <label>1.</label>
+                    <input type="text" id="keluarga1" placeholder="Nama keluarga / hubungan keluarga">
+                </div>
+                <div class="keluarga-item">
+                    <label>2.</label>
+                    <input type="text" id="keluarga2" placeholder="Nama keluarga / hubungan keluarga">
+                </div>
+                <div class="keluarga-item">
+                    <label>3.</label>
+                    <input type="text" id="keluarga3" placeholder="Nama keluarga / hubungan keluarga">
+                </div>
+                <div class="keluarga-item">
+                    <label>4.</label>
+                    <input type="text" id="keluarga4" placeholder="Nama keluarga / hubungan keluarga">
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn btn-info" onclick="isiContohData()">Isi Contoh Data</button>
+            <button class="btn btn-primary" onclick="previewSurat()">Preview Surat</button>
+            <button class="btn btn-success" onclick="printSurat()">Print/Export PDF</button>
+        </div>
+    </div>
+
+    <!-- Surat Template -->
+    <div class="surat" id="suratTemplate">
+        <div class="header">
+            <h1>PAWARTOS LELAYU</h1>
+        </div>
+        
+        <div class="content">
+            <div class="data-line">
+                <span class="label">Katur Pedukuhan/Masjid</span>
+                <span class="value" id="displayTujuan"></span>
+            </div>
+            
+            <p><strong>Assalamu'alaikum Wr.Wb</strong></p>
+            
+            <p>Sampun katimbalan sowan Wonten ngarsa dalem Allah SWT</p>
+            
+            <div class="data-line">
+                <span class="label">panjenenganipun</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayNamaAlmarhum"></span>
+            </div>
+            
+            <div class="alamat-section">
+                <div class="data-line">
+                    <span class="label">Ingkang pidalem ing</span>
+                    <span class="colon">:</span>
+                    <span class="value">Ngulakan RT <span id="displayRt"></span> /RW <span id="displayRw"></span> , Hargorejo, Kokap</span>
+                </div>
+            </div>
+            
+            <div class="data-line">
+                <span class="label">Sedo rikolo</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayTanggalMeninggal"></span>
+            </div>
+            
+            <div class="data-line">
+                <span class="label">Jam</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayJamMeninggal"></span>
+            </div>
+            
+            <div class="data-line">
+                <span class="label">Yuswo</span>
+                <span class="colon">:</span>
+                <span class="value" id="displayUsia"></span>
+            </div>
+            
+            <div class="data-line">
+                <span class="label">Kanthi Lantaran</span>
+                <span class="colon">:</span>
+                <span class="value" id="displaySebabMeninggal"></span>
+            </div>
+            
+            <div class="pemakaman-section">
+                <p><strong>Jenazah badhe dipun makamaken:</strong></p>
+                
+                <div class="data-line">
+                    <span class="label">Dinten</span>
+                    <span class="colon">:</span>
+                    <span class="value" id="displayHariPemakaman"></span>
+                </div>
+                
+                <div class="data-line">
+                    <span class="label">Jam</span>
+                    <span class="colon">:</span>
+                    <span class="value" id="displayJamPemakaman"></span>
+                </div>
+                
+                <div class="data-line">
+                    <span class="label">Wonten ing</span>
+                    <span class="colon">:</span>
+                    <span class="value" id="displayTempatPemakaman"></span>
+                </div>
+            </div>
+            
+            <div class="closing">
+                <p>Mekaten pawartos Lelayu kulo aturaken awit kawigatosanipun<br>
+                dipun aturaken agunging panuwun</p>
+                
+                <p><strong>Wassalamu'alaikum Wr. Wb</strong></p>
+            </div>
+            
+            <div class="keluarga-duka">
+                <p><strong>Keluargo dukito :</strong></p>
+                <ol class="keluarga-list">
+                    <li id="displayKeluarga1"></li>
+                    <li id="displayKeluarga2"></li>
+                    <li id="displayKeluarga3"></li>
+                    <li id="displayKeluarga4"></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set tanggal hari ini sebagai default untuk tanggal meninggal
+        document.getElementById('tanggalMeninggal').valueAsDate = new Date();
+        
+        function formatTanggalIndonesia(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulan = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            const namaHari = hari[date.getDay()];
+            const tanggal = date.getDate();
+            const namaBulan = bulan[date.getMonth()];
+            const tahun = date.getFullYear();
+            
+            return `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
+        }
+        
+        function formatJam(timeString) {
+            if (!timeString) return '';
+            return timeString + ' WIB';
+        }
+        
+        function previewSurat() {
+            // Ambil semua data dari form
+            document.getElementById('displayTujuan').textContent = document.getElementById('tujuan').value;
+            document.getElementById('displayNamaAlmarhum').textContent = document.getElementById('namaAlmarhum').value;
+            document.getElementById('displayRt').textContent = document.getElementById('rt').value;
+            document.getElementById('displayRw').textContent = document.getElementById('rw').value;
+            document.getElementById('displayTanggalMeninggal').textContent = formatTanggalIndonesia(document.getElementById('tanggalMeninggal').value);
+            document.getElementById('displayJamMeninggal').textContent = formatJam(document.getElementById('jamMeninggal').value);
+            document.getElementById('displayUsia').textContent = document.getElementById('usia').value;
+            document.getElementById('displaySebabMeninggal').textContent = document.getElementById('sebabMeninggal').value;
+            document.getElementById('displayHariPemakaman').textContent = document.getElementById('hariPemakaman').value;
+            document.getElementById('displayJamPemakaman').textContent = formatJam(document.getElementById('jamPemakaman').value);
+            document.getElementById('displayTempatPemakaman').textContent = document.getElementById('tempatPemakaman').value;
+            document.getElementById('displayKeluarga1').textContent = document.getElementById('keluarga1').value;
+            document.getElementById('displayKeluarga2').textContent = document.getElementById('keluarga2').value;
+            document.getElementById('displayKeluarga3').textContent = document.getElementById('keluarga3').value;
+            document.getElementById('displayKeluarga4').textContent = document.getElementById('keluarga4').value;
+            
+            // Sembunyikan form dan tampilkan surat
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('suratTemplate').style.display = 'block';
+            
+            // Tambahkan tombol kembali
+            if (!document.getElementById('backButton')) {
+                const backButton = document.createElement('button');
+                backButton.id = 'backButton';
+                backButton.textContent = 'Kembali ke Form';
+                backButton.className = 'btn btn-primary';
+                backButton.style.position = 'fixed';
+                backButton.style.top = '20px';
+                backButton.style.right = '20px';
+                backButton.style.zIndex = '1000';
+                backButton.onclick = function() {
+                    document.querySelector('.container').style.display = 'block';
+                    document.getElementById('suratTemplate').style.display = 'none';
+                    this.remove();
+                };
+                document.body.appendChild(backButton);
+            }
+        }
+        
+        function printSurat() {
+            previewSurat();
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        function isiContohData() {
+            // Data tujuan
+            document.getElementById('tujuan').value = 'Pedukuhan Ngulakan';
+            
+            // Data almarhum
+            document.getElementById('namaAlmarhum').value = 'Mbah Sutrisno';
+            document.getElementById('rt').value = '003';
+            document.getElementById('rw').value = '002';
+            
+            // Data kematian
+            document.getElementById('tanggalMeninggal').valueAsDate = new Date();
+            document.getElementById('jamMeninggal').value = '14:30';
+            document.getElementById('usia').value = '78 tahun';
+            document.getElementById('sebabMeninggal').value = 'Sakit tua';
+            
+            // Data pemakaman - set besok untuk pemakaman
+            const besok = new Date();
+            besok.setDate(besok.getDate() + 1);
+            const hariNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulanNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            document.getElementById('hariPemakaman').value = `${hariNames[besok.getDay()]}, ${besok.getDate()} ${bulanNames[besok.getMonth()]} ${besok.getFullYear()}`;
+            document.getElementById('jamPemakaman').value = '10:00';
+            document.getElementById('tempatPemakaman').value = 'Makam Desa Ngulakan';
+            
+            // Keluarga duka
+            document.getElementById('keluarga1').value = 'Bapak Suharjo (Putra)';
+            document.getElementById('keluarga2').value = 'Ibu Siti Rahayu (Putri)';
+            document.getElementById('keluarga3').value = 'Bapak Joko Susilo (Menantu)';
+            document.getElementById('keluarga4').value = 'Keluarga besar almarhum';
+            
+            alert('Contoh data telah diisi! Anda bisa mengedit sesuai kebutuhan.');
+        }
+    </script>
+</body>
+</html>

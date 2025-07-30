@@ -1,0 +1,19 @@
+<nav class="w-full h-[50px] bg-gray-900 text-white px-8 flex items-center justify-between">
+    <div class="font-bold text-xl">Admin Panel</div>
+    <ul class="flex space-x-6 list-none m-0 p-0">
+        <% if ((typeof user !== 'undefined' && user) || (typeof currentUser !== 'undefined' && currentUser)) { %>
+            <% const sessionUser = user || currentUser; %>
+            <li><a href="/admin/dashboard" class="hover:text-blue-400 <%= req.path === '/admin/dashboard' ? 'text-blue-400' : '' %>">Dashboard</a></li>
+            <li><a href="/admin/users" class="hover:text-blue-400 <%= req.path.startsWith('/admin/users') ? 'text-blue-400' : '' %>">User</a></li>
+            <li><a href="/admin/kegiatan" class="hover:text-blue-400 <%= req.path.startsWith('/admin/kegiatan') ? 'text-blue-400' : '' %>">Kegiatan</a></li>
+            <li><a href="/admin/pengumuman" class="hover:text-blue-400 <%= req.path.startsWith('/admin/pengumuman') ? 'text-blue-400' : '' %>">Pengumuman</a></li>
+            <li><a href="/admin/struktur" class="hover:text-blue-400 <%= req.path.startsWith('/admin/struktur') ? 'text-blue-400' : '' %>">Struktur</a></li>
+            <li><a href="/admin/umkm" class="hover:text-blue-400 <%= req.path.startsWith('/admin/umkm') ? 'text-blue-400' : '' %>">UMKM</a></li>
+            <li><a href="/logout" class="hover:text-red-400">Logout</a></li>
+        <% } else { %>
+            <li><a href="/" class="hover:text-blue-400">Dashboard Public</a></li>
+            <li><a href="/berkas" class="hover:text-blue-400">Berkas</a></li>
+            <li><a href="/login" class="hover:text-blue-400">Login Admin</a></li>
+        <% } %>
+    </ul>
+</nav>

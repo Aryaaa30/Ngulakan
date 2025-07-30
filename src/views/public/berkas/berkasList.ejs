@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pilih Jenis Berkas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <%- include('../../partials/navbar') %>
+    <div class="max-w-3xl mx-auto mt-16 p-8 bg-white rounded shadow">
+        <h2 class="text-2xl font-bold mb-8 text-center">Pilih Jenis Berkas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Card Data Kematian -->
+            <a href="/berkas/lelayu" class="block bg-red-100 hover:bg-red-200 rounded-lg shadow p-6 text-center transition">
+                <h3 class="text-xl font-semibold mb-2 text-red-700">Data Kematian</h3>
+                <p class="text-gray-700">Form untuk surat keterangan kematian (lelayu).</p>
+            </a>
+            <!-- Card Data Perijinan -->
+            <a href="/berkas/pengantar" class="block bg-blue-100 hover:bg-blue-200 rounded-lg shadow p-6 text-center transition">
+                <h3 class="text-xl font-semibold mb-2 text-blue-700">Data Perijinan</h3>
+                <p class="text-gray-700">Form untuk surat pengantar perijinan.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

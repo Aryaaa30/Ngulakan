@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detail Kegiatan Desa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function formatTanggalIndonesia(tanggal) {
+            if (!tanggal) return '';
+            const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulan = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            const date = new Date(tanggal);
+            const namaHari = hari[date.getDay()];
+            const tanggalNum = date.getDate();
+            const namaBulan = bulan[date.getMonth()];
+            const tahun = date.getFullYear();
+            return `${namaHari}, ${tanggalNum} ${namaBulan} ${tahun}`;
+        }
+    </script>
+</head>
+<body class="bg-gray-50 relative">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-7xl mx-auto mt-8 flex flex-col lg:flex-row gap-8 px-4">
+        <!-- Kiri: Detail -->
+        <div class="flex-1 bg-white rounded shadow p-6">
+            <% if (kegiatan.foto) { %>
+                <img 
+                    src="<%= kegiatan.foto %>" 
+                    alt="Foto Kegiatan" 
+                    class="w-full h-64 object-cover rounded mb-6 shadow cursor-pointer"
+                    onclick="bukaModal('<%= kegiatan.foto %>')"
+                >
+            <% } %>
+
+            <h2 class="text-3xl font-bold mb-6">
+                <%= kegiatan.nama_kegiatan %>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 mb-6">
+                <!-- Tanggal & Jam -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📅</div>
+                    <div>
+                        <p class="font-semibold">Tanggal & Jam</p>
+                        <p>
+                            <span id="tanggalDetail" class="inline-block"></span>
+                            <% if (kegiatan.jam_kegiatan) { %>
+                                - <%= kegiatan.jam_kegiatan %> WIB
+                            <% } %>
+                        </p>
+                    </div>
+                </div>
+                <!-- Alamat -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📍</div>
+                    <div>
+                        <p class="font-semibold">Alamat</p>
+                        <p><%= kegiatan.alamat_kegiatan %></p>
+                    </div>
+                </div>
+                <!-- Kategori -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">🏷️</div>
+                    <div>
+                        <p class="font-semibold">Kategori</p>
+                        <p><%= kegiatan.kategori_kegiatan %></p>
+                    </div>
+                </div>
+                <!-- Status -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📌</div>
+                    <div>
+                        <p class="font-semibold">Status</p>
+                        <p><%= kegiatan.status_kegiatan %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deskripsi -->
+            <div class="mb-6 text-gray-700">
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📝</div>
+                    <div>
+                        <p class="font-semibold mb-1">Deskripsi</p>
+                        <p><%= kegiatan.deskripsi_kegiatan %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aksi -->
+            <div class="flex gap-4">
+                <a href="/admin/kegiatan/edit/<%= kegiatan.id_kegiatan_desa %>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
+                <a href="/admin/kegiatan" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Kembali</a>
+            </div>
+        </div>
+
+        <!-- Kanan: Daftar Kegiatan Lainnya -->
+        <div class="w-full lg:w-80 flex flex-col gap-2">
+            <div class="mb-2">
+                <h3 class="text-lg font-bold text-gray-700">Kegiatan Lainnya</h3>
+                <p class="text-xs text-gray-500">Scroll ke bawah untuk melihat semua kegiatan</p>
+            </div>
+
+            <div class="w-full h-[690px] overflow-y-auto flex flex-col gap-4 pr-1">
+                <% kegiatanList.forEach(item => { if (item.id_kegiatan_desa !== kegiatan.id_kegiatan_desa) { %>
+                <a href="/admin/kegiatan/<%= item.id_kegiatan_desa %>" class="flex items-start bg-white rounded shadow p-4 hover:bg-blue-50 transition">
+                    <% if (item.foto) { %>
+                        <img src="<%= item.foto %>" alt="Foto Kegiatan" class="w-16 h-16 object-cover rounded mr-4">
+                    <% } else { %>
+                        <div class="w-16 h-16 bg-gray-200 rounded mr-4 flex items-center justify-center text-gray-400 text-sm">No Image</div>
+                    <% } %>
+                    <div class="flex-1 text-sm text-gray-700">
+                        <div class="flex items-center gap-2 font-semibold text-md mb-1">
+                            <%= item.nama_kegiatan %>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1 text-gray-600">
+                            <span class="text-xs">📅</span>
+                            <script>document.write(formatTanggalIndonesia('<%= item.tanggal_kegiatan %>'));</script>
+                        </div>
+                        <% if (item.jam_kegiatan) { %>
+                        <div class="flex items-center gap-2 mb-1 text-gray-600">
+                            <span class="text-xs">⏰</span>
+                            <%= item.jam_kegiatan %> WIB
+                        </div>
+                        <% } %>
+                        <div class="flex items-center gap-2 mb-1 text-gray-400 text-xs">
+                            <span class="text-xs">📍</span>
+                            <%= item.alamat_kegiatan %>
+                        </div>
+                    </div>
+                </a>
+                <% } }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gambar Fullscreen -->
+    <div id="modalGambar" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden items-center justify-center">
+        <button onclick="tutupModal()" class="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400">×</button>
+        <img id="modalImg" src="" alt="Gambar Besar" class="max-w-full max-h-[90vh] rounded shadow-xl border-4 border-white">
+    </div>
+
+    <script>
+        // Format tanggal utama
+        document.getElementById('tanggalDetail').innerText = formatTanggalIndonesia('<%= kegiatan.tanggal_kegiatan %>');
+
+        // Modal handler
+        function bukaModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('modalGambar').classList.remove('hidden');
+            document.getElementById('modalGambar').classList.add('flex');
+        }
+
+        function tutupModal() {
+            document.getElementById('modalGambar').classList.remove('flex');
+            document.getElementById('modalGambar').classList.add('hidden');
+            document.getElementById('modalImg').src = '';
+        }
+    </script>
+</body>
+</html>

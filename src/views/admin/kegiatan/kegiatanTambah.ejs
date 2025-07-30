@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah Kegiatan Desa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+    <div class="max-w-xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Tambah Kegiatan Desa</h2>
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div id="modalError" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+            <div class="bg-white rounded shadow-lg p-6 max-w-sm text-center">
+                <h3 class="text-lg font-bold mb-2 text-red-600">Error</h3>
+                <p class="mb-4"><%= error %></p>
+                <button onclick="document.getElementById('modalError').style.display='none'" class="px-4 py-2 bg-blue-600 text-white rounded">Tutup</button>
+            </div>
+        </div>
+        <% } %>
+        <form action="/admin/kegiatan/tambah" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block mb-1 font-semibold">Nama Kegiatan</label>
+                <input type="text" name="nama_kegiatan" required class="w-full border px-3 py-2 rounded">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Tanggal Kegiatan</label>
+                <input type="date" name="tanggal_kegiatan" required class="w-full border px-3 py-2 rounded">
+                <p class="text-xs text-gray-500 mt-1">Format: hari, tanggal bulan tahun akan otomatis</p>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Jam Kegiatan</label>
+                <input type="time" name="jam_kegiatan" required class="w-full border px-3 py-2 rounded">
+                <p class="text-xs text-gray-500 mt-1">Contoh: 08:00</p>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Alamat Kegiatan</label>
+                <input type="text" name="alamat_kegiatan" required class="w-full border px-3 py-2 rounded">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Deskripsi Kegiatan</label>
+                <textarea name="deskripsi_kegiatan" rows="4" class="w-full border px-3 py-2 rounded"></textarea>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Foto (Upload)</label>
+                <input type="file" name="foto" accept="image/*" class="w-full border px-3 py-2 rounded">
+                <p class="text-xs text-gray-500 mt-1">Maksimal ukuran file: 1 MB</p>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Kategori Kegiatan</label>
+                <select name="kategori_kegiatan" required class="w-full border px-3 py-2 rounded">
+                    <option value="">Pilih Kategori</option>
+                    <option value="Sosial">Sosial</option>
+                    <option value="Budaya">Budaya</option>
+                    <option value="Keagamaan">Keagamaan</option>
+                    <option value="Pendidikan">Pendidikan</option>
+                    <option value="Kesehatan">Kesehatan</option>
+                    <option value="Olahraga">Olahraga</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">Status Kegiatan</label>
+                <select name="status_kegiatan" required class="w-full border px-3 py-2 rounded">
+                    <option value="Direncanakan">Direncanakan</option>
+                    <option value="Berlangsung">Berlangsung</option>
+                    <option value="Selesai">Selesai</option>
+                    <option value="Dibatalkan">Dibatalkan</option>
+                </select>
+            </div>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan</button>
+            <a href="/admin/kegiatan" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</a>
+        </form>
+    </div>
+</body>
+</html>
