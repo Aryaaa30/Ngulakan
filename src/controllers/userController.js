@@ -5,21 +5,21 @@ const hashHelper = require('../utils/hashHelper');
 exports.list = async (req, res) => {
     try {
         const users = await User.find().select('-password').sort({ created_at: -1 });
-        res.render('admin/user/userList', { users, req, user: req.session.user });
+        res.render('admin/user/userList', { users, user: req.session.user, currentPath: req.path });
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).render('admin/user/userList', { 
             users: [], 
             error: 'Gagal memuat daftar user',
-            req,
-            user: req.session.user
+            user: req.session.user,
+            currentPath: req.path
         });
     }
 };
 
 // Show add user form
 exports.showTambah = (req, res) => {
-    res.render('admin/user/userTambah', { user: req.session.user });
+    res.render('admin/user/userTambah', { user: req.session.user, currentPath: req.path });
 };
 
 // Add new user
@@ -31,21 +31,24 @@ exports.tambah = async (req, res) => {
         if (!nama || !email || !password || !role) {
             return res.render('admin/user/userTambah', {
                 error: 'Semua field wajib diisi',
-                user: req.session.user
+                user: req.session.user,
+                currentPath: req.path
             });
         }
 
         if (password !== confirmPassword) {
             return res.render('admin/user/userTambah', {
                 error: 'Konfirmasi password tidak cocok',
-                user: req.session.user
+                user: req.session.user,
+                currentPath: req.path
             });
         }
 
         if (password.length < 6) {
             return res.render('admin/user/userTambah', {
                 error: 'Password minimal 6 karakter',
-                user: req.session.user
+                user: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -54,7 +57,8 @@ exports.tambah = async (req, res) => {
         if (existingUser) {
             return res.render('admin/user/userTambah', {
                 error: 'Email sudah terdaftar',
-                user: req.session.user
+                user: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -77,7 +81,8 @@ exports.tambah = async (req, res) => {
         console.error('Error adding user:', error);
         res.render('admin/user/userTambah', {
             error: 'Gagal menambahkan user',
-            user: req.session.user
+            user: req.session.user,
+            currentPath: req.path
         });
     }
 };
@@ -89,7 +94,7 @@ exports.showEdit = async (req, res) => {
         if (!user) {
             return res.redirect('/admin/users?error=User tidak ditemukan');
         }
-        res.render('admin/user/userEdit', { user, currentUser: req.session.user });
+        res.render('admin/user/userEdit', { user, currentUser: req.session.user, currentPath: req.path });
     } catch (error) {
         console.error('Error fetching user:', error);
         res.redirect('/admin/users?error=Gagal memuat data user');
@@ -107,7 +112,8 @@ exports.edit = async (req, res) => {
             return res.render('admin/user/userEdit', {
                 user: { _id: userId, nama, email, role, status },
                 error: 'Nama, email, dan role wajib diisi',
-                currentUser: req.session.user
+                currentUser: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -115,7 +121,8 @@ exports.edit = async (req, res) => {
             return res.render('admin/user/userEdit', {
                 user: { _id: userId, nama, email, role, status },
                 error: 'Konfirmasi password tidak cocok',
-                currentUser: req.session.user
+                currentUser: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -123,7 +130,8 @@ exports.edit = async (req, res) => {
             return res.render('admin/user/userEdit', {
                 user: { _id: userId, nama, email, role, status },
                 error: 'Password minimal 6 karakter',
-                currentUser: req.session.user
+                currentUser: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -133,7 +141,8 @@ exports.edit = async (req, res) => {
             return res.render('admin/user/userEdit', {
                 user: { _id: userId, nama, email, role, status },
                 error: 'Email sudah terdaftar',
-                currentUser: req.session.user
+                currentUser: req.session.user,
+                currentPath: req.path
             });
         }
 
@@ -158,7 +167,8 @@ exports.edit = async (req, res) => {
         res.render('admin/user/userEdit', {
             user: { _id: req.params.id, ...req.body },
             error: 'Gagal mengupdate user',
-            currentUser: req.session.user
+            currentUser: req.session.user,
+            currentPath: req.path
         });
     }
 };
@@ -177,7 +187,7 @@ exports.detail = async (req, res) => {
             totalAnnouncements: 0
         };
 
-        res.render('admin/user/userDetail', { user, userStats, currentUser: req.session.user });
+        res.render('admin/user/userDetail', { user, userStats, currentUser: req.session.user, currentPath: req.path });
     } catch (error) {
         console.error('Error fetching user detail:', error);
         res.redirect('/admin/users?error=Gagal memuat detail user');

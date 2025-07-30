@@ -24,7 +24,8 @@ exports.uploadMiddleware = (req, res, next) => {
             if (req.url.includes('/tambah')) {
                 return res.render('admin/kegiatan/kegiatanTambah', {
                     user: req.session.user,
-                    error: 'Ukuran file foto maksimal 1 MB!'
+                    error: 'Ukuran file foto maksimal 1 MB!',
+                    currentPath: req.path
                 });
             }
             // Jika sedang edit
@@ -33,7 +34,8 @@ exports.uploadMiddleware = (req, res, next) => {
                     res.render('admin/kegiatan/kegiatanEdit', {
                         kegiatan,
                         user: req.session.user,
-                        error: 'Ukuran file foto maksimal 1 MB!'
+                        error: 'Ukuran file foto maksimal 1 MB!',
+                        currentPath: req.path
                     });
                 });
                 return;
@@ -48,7 +50,8 @@ exports.list = async (req, res) => {
     const kegiatan = await kegiatanModel.getAll();
     res.render('admin/kegiatan/kegiatanList', {
         kegiatan,
-        user: req.session.user
+        user: req.session.user,
+        currentPath: req.path
     });
 };
 
@@ -59,14 +62,16 @@ exports.detail = async (req, res) => {
     res.render('admin/kegiatan/kegiatanDetail', {
         kegiatan,
         kegiatanList,
-        user: req.session.user
+        user: req.session.user,
+        currentPath: req.path
     });
 };
 
 // Menampilkan form tambah kegiatan
 exports.showTambah = (req, res) => {
     res.render('admin/kegiatan/kegiatanTambah', {
-        user: req.session.user
+        user: req.session.user,
+        currentPath: req.path
     });
 };
 
@@ -102,7 +107,8 @@ exports.showEdit = async (req, res) => {
     const kegiatan = await kegiatanModel.getById(req.params.id);
     res.render('admin/kegiatan/kegiatanEdit', {
         kegiatan,
-        user: req.session.user
+        user: req.session.user,
+        currentPath: req.path
     });
 };
 

@@ -56,5 +56,8 @@ exports.delete = async (req, res, next) => {
 };
 
 exports.dashboard = (req, res) => {
-    res.render('admin/dashboardAdmin', { user: req.session.user });
+    res.render('admin/dashboardAdmin', { 
+        user: req.session.user,
+        currentPath: req.path 
+    });
 };

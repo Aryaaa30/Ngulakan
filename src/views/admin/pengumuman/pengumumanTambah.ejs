@@ -5,27 +5,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function validateForm() {
-            const judul = document.getElementById('judul').value.trim();
-            const isi = document.getElementById('isi').value.trim();
-            const kategori = document.getElementById('kategori').value;
-            const status = document.getElementById('status').value;
+            const nama_pengumuman = document.getElementById('nama_pengumuman').value.trim();
+            const isi_pengumuman = document.getElementById('isi_pengumuman').value.trim();
+            const kategori_pengumuman = document.getElementById('kategori_pengumuman').value;
+            const status_pengumuman = document.getElementById('status_pengumuman').value;
 
-            if (!judul) {
-                alert('Judul pengumuman harus diisi');
+            if (!nama_pengumuman) {
+                alert('Nama pengumuman harus diisi');
                 return false;
             }
 
-            if (!isi) {
+            if (!isi_pengumuman) {
                 alert('Isi pengumuman harus diisi');
                 return false;
             }
 
-            if (!kategori) {
+            if (!kategori_pengumuman) {
                 alert('Kategori harus dipilih');
                 return false;
             }
 
-            if (!status) {
+            if (!status_pengumuman) {
                 alert('Status harus dipilih');
                 return false;
             }
@@ -34,9 +34,9 @@
         }
 
         function updateCharacterCount() {
-            const isi = document.getElementById('isi').value;
+            const isi_pengumuman = document.getElementById('isi_pengumuman').value;
             const maxLength = 1000;
-            const currentLength = isi.length;
+            const currentLength = isi_pengumuman.length;
             const remaining = maxLength - currentLength;
             
             document.getElementById('charCount').textContent = `${currentLength}/${maxLength} karakter`;
@@ -48,80 +48,9 @@
             }
         }
 
-        // Auto save functionality
-        let autoSaveTimer;
-        const AUTO_SAVE_DELAY = 3000; // 3 seconds
-
-        function setupAutoSave() {
-            const form = document.getElementById('pengumumanForm');
-            const inputs = form.querySelectorAll('input, select, textarea');
-            
-            inputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    clearTimeout(autoSaveTimer);
-                    autoSaveTimer = setTimeout(() => {
-                        autoSave();
-                    }, AUTO_SAVE_DELAY);
-                });
-            });
-        }
-
-        function autoSave() {
-            const formData = new FormData(document.getElementById('pengumumanForm'));
-            const data = Object.fromEntries(formData);
-            
-            // Save to localStorage
-            localStorage.setItem('pengumumanFormDraft', JSON.stringify(data));
-            
-            // Show auto save indicator
-            showAutoSaveIndicator('Draft tersimpan otomatis');
-        }
-
-        function showAutoSaveIndicator(message) {
-            const indicator = document.getElementById('autoSaveIndicator');
-            indicator.textContent = message;
-            indicator.classList.remove('hidden');
-            
-            setTimeout(() => {
-                indicator.classList.add('hidden');
-            }, 2000);
-        }
-
-        function loadDraft() {
-            const draft = localStorage.getItem('pengumumanFormDraft');
-            if (draft) {
-                const data = JSON.parse(draft);
-                
-                // Fill form fields
-                Object.keys(data).forEach(key => {
-                    const field = document.getElementById(key);
-                    if (field) {
-                        field.value = data[key];
-                    }
-                });
-                
-                // Update character count
-                updateCharacterCount();
-                
-                showAutoSaveIndicator('Draft dimuat');
-            }
-        }
-
-        function clearDraft() {
-            localStorage.removeItem('pengumumanFormDraft');
-            showAutoSaveIndicator('Draft dihapus');
-        }
-
-        // Initialize auto save when page loads
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            setupAutoSave();
-            loadDraft();
             updateCharacterCount();
-        });
-
-        // Clear draft when form is successfully submitted
-        document.getElementById('pengumumanForm').addEventListener('submit', function() {
-            clearDraft();
         });
     </script>
 </head>
@@ -132,16 +61,8 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Tambah Pengumuman Baru</h2>
             <div class="flex gap-2">
-                <button onclick="clearDraft()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
-                    Hapus Draft
-                </button>
                 <a href="/admin/pengumuman" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Kembali</a>
             </div>
-        </div>
-
-        <!-- Auto Save Indicator -->
-        <div id="autoSaveIndicator" class="hidden mb-4 p-2 bg-blue-100 border border-blue-400 text-blue-700 rounded text-sm">
-            <span class="font-medium">✓</span> <span id="autoSaveMessage"></span>
         </div>
 
         <% if (typeof error !== 'undefined' && error) { %>
@@ -158,15 +79,15 @@
 
         <form id="pengumumanForm" action="/admin/pengumuman/tambah" method="POST" onsubmit="return validateForm()">
             <div class="mb-4">
-                <label for="judul" class="block text-sm font-medium text-gray-700 mb-2">Judul Pengumuman *</label>
-                <input type="text" id="judul" name="judul" required 
+                <label for="nama_pengumuman" class="block text-sm font-medium text-gray-700 mb-2">Nama Pengumuman *</label>
+                <input type="text" id="nama_pengumuman" name="nama_pengumuman" required 
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Masukkan judul pengumuman">
+                       placeholder="Masukkan nama pengumuman">
             </div>
 
             <div class="mb-4">
-                <label for="isi" class="block text-sm font-medium text-gray-700 mb-2">Isi Pengumuman *</label>
-                <textarea id="isi" name="isi" rows="8" required 
+                <label for="isi_pengumuman" class="block text-sm font-medium text-gray-700 mb-2">Isi Pengumuman *</label>
+                <textarea id="isi_pengumuman" name="isi_pengumuman" rows="8" required 
                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Masukkan isi pengumuman"
                           oninput="updateCharacterCount()"></textarea>
@@ -176,33 +97,46 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label for="kategori" class="block text-sm font-medium text-gray-700 mb-2">Kategori *</label>
-                    <select id="kategori" name="kategori" required 
+                    <label for="kategori_pengumuman" class="block text-sm font-medium text-gray-700 mb-2">Kategori *</label>
+                    <select id="kategori_pengumuman" name="kategori_pengumuman" required 
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Pilih Kategori</option>
                         <option value="Umum">Umum</option>
-                        <option value="Penting">Penting</option>
-                        <option value="Darurat">Darurat</option>
-                        <option value="Kegiatan">Kegiatan</option>
-                        <option value="Informasi">Informasi</option>
+                        <option value="Bantuan Sosial">Bantuan Sosial</option>
+                        <option value="Keagamaan">Keagamaan</option>
+                        <option value="Kesehatan">Kesehatan</option>
+                        <option value="Pendidikan">Pendidikan</option>
+                        <option value="Keamanan">Keamanan</option>
+                        <option value="Pemilu">Pemilu</option>
                     </select>
                 </div>
 
                 <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select id="status" name="status" 
+                    <label for="status_pengumuman" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="status_pengumuman" name="status_pengumuman" 
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Aktif">Aktif</option>
-                        <option value="Nonaktif">Nonaktif</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Dipublikasi">Dipublikasi</option>
+                        <option value="Arsip">Arsip</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="prioritas" class="block text-sm font-medium text-gray-700 mb-2">Prioritas</label>
+                    <select id="prioritas" name="prioritas" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Normal">Normal</option>
+                        <option value="Penting">Penting</option>
+                        <option value="Sangat Penting">Sangat Penting</option>
                     </select>
                 </div>
             </div>
 
             <div class="mb-6">
-                <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pengumuman</label>
-                <input type="date" id="tanggal" name="tanggal" 
+                <label for="tanggal_pengumuman" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Pengumuman</label>
+                <input type="date" id="tanggal_pengumuman" name="tanggal_pengumuman" 
                        value="<%= new Date().toISOString().split('T')[0] %>"
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
@@ -210,9 +144,6 @@
             <div class="flex gap-4">
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     Simpan Pengumuman
-                </button>
-                <button type="button" onclick="autoSave()" class="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                    Simpan Draft
                 </button>
                 <a href="/admin/pengumuman" class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
                     Batal

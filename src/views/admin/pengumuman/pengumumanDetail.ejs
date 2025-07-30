@@ -23,15 +23,18 @@
                     <h3 class="text-lg font-semibold text-blue-800 mb-4">Informasi Utama</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Judul Pengumuman</label>
+                            <label class="block text-sm font-medium text-gray-700">Nama Pengumuman</label>
                             <p class="text-lg font-semibold text-gray-900"><%= pengumuman.nama_pengumuman %></p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Kategori</label>
                             <span class="inline-block px-3 py-1 text-sm font-medium rounded-full 
-                                       <%= pengumuman.kategori_pengumuman === 'Penting' ? 'bg-red-100 text-red-800' : 
-                                           pengumuman.kategori_pengumuman === 'Darurat' ? 'bg-orange-100 text-orange-800' : 
-                                           pengumuman.kategori_pengumuman === 'Kegiatan' ? 'bg-blue-100 text-blue-800' : 
+                                       <%= pengumuman.kategori_pengumuman === 'Bantuan Sosial' ? 'bg-red-100 text-red-800' : 
+                                           pengumuman.kategori_pengumuman === 'Keagamaan' ? 'bg-purple-100 text-purple-800' : 
+                                           pengumuman.kategori_pengumuman === 'Kesehatan' ? 'bg-green-100 text-green-800' : 
+                                           pengumuman.kategori_pengumuman === 'Pendidikan' ? 'bg-blue-100 text-blue-800' : 
+                                           pengumuman.kategori_pengumuman === 'Keamanan' ? 'bg-orange-100 text-orange-800' : 
+                                           pengumuman.kategori_pengumuman === 'Pemilu' ? 'bg-yellow-100 text-yellow-800' : 
                                            'bg-gray-100 text-gray-800' %>">
                                 <%= pengumuman.kategori_pengumuman %>
                             </span>
@@ -39,8 +42,19 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status</label>
                             <span class="inline-block px-3 py-1 text-sm font-medium rounded-full 
-                                       <%= pengumuman.status_pengumuman === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                                       <%= pengumuman.status_pengumuman === 'Dipublikasi' ? 'bg-green-100 text-green-800' : 
+                                           pengumuman.status_pengumuman === 'Draft' ? 'bg-yellow-100 text-yellow-800' : 
+                                           'bg-gray-100 text-gray-800' %>">
                                 <%= pengumuman.status_pengumuman %>
+                            </span>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Prioritas</label>
+                            <span class="inline-block px-3 py-1 text-sm font-medium rounded-full 
+                                       <%= pengumuman.prioritas === 'Sangat Penting' ? 'bg-red-100 text-red-800' : 
+                                           pengumuman.prioritas === 'Penting' ? 'bg-orange-100 text-orange-800' : 
+                                           'bg-gray-100 text-gray-800' %>">
+                                <%= pengumuman.prioritas %>
                             </span>
                         </div>
                         <div>
@@ -87,8 +101,8 @@
                     <h3 class="text-lg font-semibold text-yellow-800 mb-4">Aksi Cepat</h3>
                     <div class="space-y-3">
                         <button onclick="togglePengumumanStatus('<%= pengumuman.id_pengumuman_desa %>', '<%= pengumuman.status_pengumuman %>')" 
-                                class="w-full px-4 py-2 <%= pengumuman.status_pengumuman === 'Aktif' ? 'bg-orange-500' : 'bg-green-500' %> text-white rounded hover:opacity-80">
-                            <%= pengumuman.status_pengumuman === 'Aktif' ? 'Nonaktifkan Pengumuman' : 'Aktifkan Pengumuman' %>
+                                class="w-full px-4 py-2 <%= pengumuman.status_pengumuman === 'Dipublikasi' ? 'bg-orange-500' : 'bg-green-500' %> text-white rounded hover:opacity-80">
+                            <%= pengumuman.status_pengumuman === 'Dipublikasi' ? 'Draft Pengumuman' : 'Publikasi Pengumuman' %>
                         </button>
                         <form action="/admin/pengumuman/hapus/<%= pengumuman.id_pengumuman_desa %>" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengumuman ini? Tindakan ini tidak dapat dibatalkan.')">
                             <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
@@ -157,14 +171,14 @@
 
     <script>
         function togglePengumumanStatus(pengumumanId, currentStatus) {
-            const newStatus = currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif';
+            const newStatus = currentStatus === 'Dipublikasi' ? 'Draft' : 'Dipublikasi';
             if (confirm(`Yakin ingin mengubah status pengumuman menjadi ${newStatus}?`)) {
                 fetch(`/admin/pengumuman/toggle-status/${pengumumanId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ status: newStatus })
+                    body: JSON.stringify({ status_pengumuman: newStatus })
                 })
                 .then(response => response.json())
                 .then(data => {
