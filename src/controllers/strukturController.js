@@ -1,10 +1,75 @@
 const strukturModel = require('../models/strukturModel');
+const path = require('path');
+const multer = require('multer');
+
+// Setup Multer untuk upload foto struktur
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../uploads/foto/struktur'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+    fileFilter: function (req, file, cb) {
+        // Check file type
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Hanya file gambar yang diperbolehkan!'), false);
+        }
+    }
+});
+
+// Middleware untuk handle upload
+exports.uploadMiddleware = (req, res, next) => {
+    upload.single('foto')(req, res, function (err) {
+        if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.render('admin/struktur/strukturTambah', {
+                    user: req.session.user,
+                    error: 'Ukuran file foto maksimal 2 MB!',
+                    nama: req.body.nama || '',
+                    jabatan: req.body.jabatan || '',
+                    kontak: req.body.kontak || '',
+                    currentPath: req.path
+                });
+            }
+            if (err.message === 'Hanya file gambar yang diperbolehkan!') {
+                return res.render('admin/struktur/strukturTambah', {
+                    user: req.session.user,
+                    error: 'Hanya file gambar (JPG, PNG, GIF) yang diperbolehkan!',
+                    nama: req.body.nama || '',
+                    jabatan: req.body.jabatan || '',
+                    kontak: req.body.kontak || '',
+                    currentPath: req.path
+                });
+            }
+        }
+        next();
+    });
+};
 
 // Get all struktur (for admin list view)
 exports.list = async (req, res) => {
   try {
     const struktur = await strukturModel.getAll();
-    res.render('admin/struktur/strukturList', { struktur, user: req.session.user, currentPath: req.path });
+    
+    // Get success/error messages from query params
+    const success = req.query.success;
+    const error = req.query.error;
+    
+    res.render('admin/struktur/strukturList', { 
+      struktur, 
+      user: req.session.user, 
+      currentPath: req.path,
+      success,
+      error
+    });
   } catch (error) {
     console.error('Error fetching struktur:', error);
     res.status(500).render('admin/struktur/strukturList', { 
@@ -24,12 +89,21 @@ exports.showTambah = (req, res) => {
 // Add new struktur
 exports.tambah = async (req, res) => {
   try {
-    const { nama, jabatan, deskripsi, status } = req.body;
+    const { nama, jabatan, kontak } = req.body;
+    let foto = null;
+
+    // Handle file upload
+    if (req.file) {
+      foto = req.file.filename;
+    }
 
     // Validation
     if (!nama || !jabatan) {
       return res.render('admin/struktur/strukturTambah', {
         error: 'Nama dan jabatan wajib diisi',
+        nama: nama || '',
+        jabatan: jabatan || '',
+        kontak: kontak || '',
         user: req.session.user,
         currentPath: req.path
       });
@@ -37,10 +111,10 @@ exports.tambah = async (req, res) => {
 
     // Create struktur
     const newStruktur = {
-      nama_struktur: nama,
-      jabatan_struktur: jabatan,
-      deskripsi_struktur: deskripsi || '',
-      status_struktur: status || 'Aktif'
+      nama: nama,
+      jabatan: jabatan,
+      foto: foto,
+      kontak: kontak || null
     };
 
     await strukturModel.create(newStruktur);
@@ -50,6 +124,9 @@ exports.tambah = async (req, res) => {
     console.error('Error adding struktur:', error);
     res.render('admin/struktur/strukturTambah', {
       error: 'Gagal menambahkan struktur',
+      nama: req.body.nama || '',
+      jabatan: req.body.jabatan || '',
+      kontak: req.body.kontak || '',
       user: req.session.user,
       currentPath: req.path
     });
@@ -73,13 +150,19 @@ exports.showEdit = async (req, res) => {
 // Update struktur
 exports.edit = async (req, res) => {
   try {
-    const { nama, jabatan, deskripsi, status } = req.body;
+    const { nama, jabatan, kontak } = req.body;
     const strukturId = req.params.id;
+    let foto = null;
+
+    // Handle file upload
+    if (req.file) {
+      foto = req.file.filename;
+    }
 
     // Validation
     if (!nama || !jabatan) {
       return res.render('admin/struktur/strukturEdit', {
-        struktur: { id_struktur: strukturId, nama_struktur: nama, jabatan_struktur: jabatan, deskripsi_struktur: deskripsi, status_struktur: status },
+        struktur: { id_struktur: strukturId, nama: nama, jabatan: jabatan, kontak: kontak },
         error: 'Nama dan jabatan wajib diisi',
         user: req.session.user,
         currentPath: req.path
@@ -88,11 +171,15 @@ exports.edit = async (req, res) => {
 
     // Update struktur data
     const updateData = {
-      nama_struktur: nama,
-      jabatan_struktur: jabatan,
-      deskripsi_struktur: deskripsi || '',
-      status_struktur: status || 'Aktif'
+      nama: nama,
+      jabatan: jabatan,
+      kontak: kontak || null
     };
+
+    // Only update foto if new file is uploaded
+    if (foto) {
+      updateData.foto = foto;
+    }
 
     await strukturModel.update(strukturId, updateData);
 
@@ -100,7 +187,7 @@ exports.edit = async (req, res) => {
   } catch (error) {
     console.error('Error updating struktur:', error);
     res.render('admin/struktur/strukturEdit', {
-      struktur: { id_struktur: req.params.id, ...req.body },
+      struktur: { id_struktur: req.params.id, nama: req.body.nama, jabatan: req.body.jabatan, kontak: req.body.kontak },
       error: 'Gagal mengupdate struktur',
       user: req.session.user,
       currentPath: req.path

@@ -7,5 +7,6 @@ router.post('/struktur/tambah', strukturController.create);
 router.get('/struktur/edit/:id', strukturController.getById);
 router.put('/struktur/edit/:id', strukturController.update);
 router.delete('/struktur/hapus/:id', strukturController.delete);
+router.get('/struktur/detail/:id', strukturController.detail);
 
 module.exports = router;

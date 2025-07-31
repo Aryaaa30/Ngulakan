@@ -43,11 +43,11 @@ router.post('/pengumuman/toggle-status/:id', ensureAuthenticated, pengumumanCont
 // Struktur Management CRUD
 router.get('/struktur', ensureAuthenticated, strukturController.list);
 router.get('/struktur/tambah', ensureAuthenticated, strukturController.showTambah);
-router.post('/struktur/tambah', ensureAuthenticated, strukturController.tambah);
+router.post('/struktur/tambah', ensureAuthenticated, strukturController.uploadMiddleware, strukturController.tambah);
+router.get('/struktur/detail/:id', ensureAuthenticated, strukturController.detail);
 router.get('/struktur/edit/:id', ensureAuthenticated, strukturController.showEdit);
-router.post('/struktur/edit/:id', ensureAuthenticated, strukturController.edit);
+router.post('/struktur/edit/:id', ensureAuthenticated, strukturController.uploadMiddleware, strukturController.edit);
 router.post('/struktur/hapus/:id', ensureAuthenticated, strukturController.hapus);
-router.get('/struktur/:id', ensureAuthenticated, strukturController.detail);
 
 // UMKM Management CRUD
 router.get('/umkm', ensureAuthenticated, umkmController.list);
