@@ -29,11 +29,12 @@ router.post('/kegiatan/hapus/:id', ensureAuthenticated, kegiatanController.hapus
 router.get('/kegiatan/:id', ensureAuthenticated, kegiatanController.detail);
 
 // Pengumuman Management CRUD
+const uploadPengumumanMiddleware = require('../middleware/uploadPengumumanMiddleware');
 router.get('/pengumuman', ensureAuthenticated, pengumumanController.list);
 router.get('/pengumuman/tambah', ensureAuthenticated, pengumumanController.showTambah);
-router.post('/pengumuman/tambah', ensureAuthenticated, pengumumanController.tambah);
+router.post('/pengumuman/tambah', ensureAuthenticated, uploadPengumumanMiddleware, pengumumanController.tambah);
 router.get('/pengumuman/edit/:id', ensureAuthenticated, pengumumanController.showEdit);
-router.post('/pengumuman/edit/:id', ensureAuthenticated, pengumumanController.edit);
+router.post('/pengumuman/edit/:id', ensureAuthenticated, uploadPengumumanMiddleware, pengumumanController.edit);
 router.post('/pengumuman/hapus/:id', ensureAuthenticated, pengumumanController.hapus);
 router.get('/pengumuman/:id', ensureAuthenticated, pengumumanController.detail);
 router.post('/pengumuman/toggle-status/:id', ensureAuthenticated, pengumumanController.toggleStatus);

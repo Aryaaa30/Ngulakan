@@ -3,11 +3,13 @@ const pool = require('../config/db');
 const pengumumanModel = {
   getAll: async () => {
     const [rows] = await pool.query(`
-      SELECT id_pengumuman_desa, id_kegiatan_desa, nama_pengumuman,
-             tanggal_pengumuman, isi_pengumuman, foto,
-             kategori_pengumuman, status_pengumuman, prioritas,
-             created_at, updated_at
-      FROM pengumuman_desa
+      SELECT p.id_pengumuman_desa, p.id_kegiatan_desa, p.nama_pengumuman,
+             p.tanggal_pengumuman, p.isi_pengumuman, p.foto,
+             p.kategori_pengumuman, p.status_pengumuman, p.prioritas,
+             p.created_at, p.updated_at,
+             k.nama_kegiatan
+      FROM pengumuman_desa p
+      LEFT JOIN kegiatan_desa k ON p.id_kegiatan_desa = k.id_kegiatan_desa
     `);
     return rows;
   },

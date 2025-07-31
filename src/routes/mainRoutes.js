@@ -1,4 +1,4 @@
-// src/routes/mainRouter.js
+
 const express = require('express');
 const router = express.Router();
 const mainController = require('../controllers/mainController');
@@ -20,8 +20,20 @@ router.get('/berkas', (req, res) => {
 router.get('/berkas/lelayu', (req, res) => {
     res.render('public/berkas/lelayu');
 });
-router.get('/berkas/pengantar', (req, res) => {
-    res.render('public/berkas/pengantar');
+
+// Components List
+router.get('/components', (req, res) => {
+    res.render('public/components/componentsList');
+});
+
+// Dynamic component route
+router.get('/components/:id', (req, res) => {
+    const id = req.params.id;
+    if (id >= 1 && id <= 10) {
+        res.render(`public/components/component${id}`);
+    } else {
+        res.status(404).send('Component tidak ditemukan');
+    }
 });
 
 module.exports = router;

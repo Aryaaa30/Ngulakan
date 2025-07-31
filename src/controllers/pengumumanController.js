@@ -1,4 +1,5 @@
 const pengumumanModel = require('../models/pengumumanModel');
+const kegiatanModel = require('../models/kegiatanModel');
 
 // Get all announcements
 exports.list = async (req, res) => {
@@ -17,14 +18,19 @@ exports.list = async (req, res) => {
 };
 
 // Show add announcement form
-exports.showTambah = (req, res) => {
-    res.render('admin/pengumuman/pengumumanTambah', { user: req.session.user, currentPath: req.path });
+exports.showTambah = async (req, res) => {
+    const kegiatanDesa = await kegiatanModel.getAll();
+    res.render('admin/pengumuman/pengumumanTambah', { kegiatanDesa, user: req.session.user, currentPath: req.path });
 };
 
 // Add new announcement
 exports.tambah = async (req, res) => {
     try {
-        const { nama_pengumuman, tanggal_pengumuman, isi_pengumuman, kategori_pengumuman, status_pengumuman, prioritas } = req.body;
+        const { id_kegiatan_desa, nama_pengumuman, tanggal_pengumuman, isi_pengumuman, kategori_pengumuman, status_pengumuman, prioritas } = req.body;
+        let foto = null;
+        if (req.file) {
+            foto = req.file.filename;
+        }
 
         // Validation
         if (!nama_pengumuman || !isi_pengumuman || !kategori_pengumuman) {
@@ -45,11 +51,11 @@ exports.tambah = async (req, res) => {
 
         // Create announcement
         const newPengumuman = {
-            id_kegiatan_desa: null, // Optional, can be null
+            id_kegiatan_desa,
             nama_pengumuman: nama_pengumuman,
             tanggal_pengumuman: tanggal_pengumuman || new Date().toISOString().split('T')[0],
             isi_pengumuman: isi_pengumuman,
-            foto: null, // Optional, can be null
+            foto: foto,
             kategori_pengumuman: kategori_pengumuman,
             status_pengumuman: status_pengumuman || 'Draft',
             prioritas: prioritas || 'Normal'
@@ -75,7 +81,9 @@ exports.showEdit = async (req, res) => {
         if (!pengumuman) {
             return res.redirect('/admin/pengumuman?error=Pengumuman tidak ditemukan');
         }
-        res.render('admin/pengumuman/pengumumanEdit', { pengumuman, user: req.session.user, currentPath: req.path });
+        const kegiatanDesa = await kegiatanModel.getAll();
+        const success = req.query.success;
+        res.render('admin/pengumuman/pengumumanEdit', { pengumuman, kegiatanDesa, user: req.session.user, currentPath: req.path, success });
     } catch (error) {
         console.error('Error fetching announcement:', error);
         res.redirect('/admin/pengumuman?error=Gagal memuat data pengumuman');
@@ -85,8 +93,12 @@ exports.showEdit = async (req, res) => {
 // Update announcement
 exports.edit = async (req, res) => {
     try {
-        const { nama_pengumuman, tanggal_pengumuman, isi_pengumuman, kategori_pengumuman, status_pengumuman, prioritas } = req.body;
+        const { nama_pengumuman, tanggal_pengumuman, isi_pengumuman, kategori_pengumuman, status_pengumuman, prioritas, id_kegiatan_desa } = req.body;
         const pengumumanId = req.params.id;
+        let foto = null;
+        if (req.file) {
+            foto = req.file.filename;
+        }
 
         // Validation
         if (!nama_pengumuman || !isi_pengumuman || !kategori_pengumuman) {
@@ -109,19 +121,22 @@ exports.edit = async (req, res) => {
 
         // Update announcement data
         const updateData = {
-            id_kegiatan_desa: null, // Optional, can be null
+            id_kegiatan_desa: id_kegiatan_desa || null,
             nama_pengumuman: nama_pengumuman,
             tanggal_pengumuman: tanggal_pengumuman,
             isi_pengumuman: isi_pengumuman,
-            foto: null, // Optional, can be null
             kategori_pengumuman: kategori_pengumuman,
             status_pengumuman: status_pengumuman || 'Draft',
             prioritas: prioritas || 'Normal'
         };
+        if (foto) {
+            updateData.foto = foto;
+        }
 
         await pengumumanModel.update(pengumumanId, updateData);
 
-        res.redirect('/admin/pengumuman?success=Pengumuman berhasil diupdate');
+        // Redirect ke halaman pengumumanList dengan pesan sukses
+        res.redirect(`/admin/pengumuman?success=Pengumuman berhasil diupdate`);
     } catch (error) {
         console.error('Error updating announcement:', error);
         res.render('admin/pengumuman/pengumumanEdit', {
@@ -141,13 +156,35 @@ exports.detail = async (req, res) => {
             return res.redirect('/admin/pengumuman?error=Pengumuman tidak ditemukan');
         }
 
-        // Get announcement statistics (placeholder for now)
-        const pengumumanStats = {
-            totalViews: 0,
-            totalShares: 0
-        };
+        // Ambil semua pengumuman lain (selain yang sedang dibuka)
+        const allPengumuman = await pengumumanModel.getAll();
+        const pengumumanList = allPengumuman.filter(item => item.id_pengumuman_desa != req.params.id);
 
-        res.render('admin/pengumuman/pengumumanDetail', { pengumuman, pengumumanStats, user: req.session.user, currentPath: req.path });
+        // Ambil data kegiatan untuk setiap pengumuman di pengumumanList
+        const kegiatanIds = pengumumanList.map(item => item.id_kegiatan_desa).filter(id => !!id);
+        let kegiatanDesaList = [];
+        if (kegiatanIds.length > 0) {
+            // Ambil semua kegiatan yang diperlukan sekaligus
+            const uniqueIds = [...new Set(kegiatanIds)];
+            const kegiatanPromises = uniqueIds.map(id => require('../models/kegiatanModel').getById(id));
+            const kegiatanResults = await Promise.all(kegiatanPromises);
+            kegiatanDesaList = kegiatanResults.filter(Boolean);
+        }
+
+        // Ambil data kegiatan desa utama untuk pengumuman yang sedang dibuka
+        let kegiatanUtama = null;
+        if (pengumuman.id_kegiatan_desa) {
+            kegiatanUtama = await require('../models/kegiatanModel').getById(pengumuman.id_kegiatan_desa);
+        }
+
+        res.render('admin/pengumuman/pengumumanDetail', {
+            pengumuman,
+            pengumumanList,
+            kegiatanDesaList,
+            kegiatanUtama,
+            user: req.session.user,
+            currentPath: req.path
+        });
     } catch (error) {
         console.error('Error fetching announcement detail:', error);
         res.redirect('/admin/pengumuman?error=Gagal memuat detail pengumuman');
