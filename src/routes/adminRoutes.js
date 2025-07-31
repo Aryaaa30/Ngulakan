@@ -5,21 +5,19 @@ const kegiatanController = require('../controllers/kegiatanController');
 const pengumumanController = require('../controllers/pengumumanController');
 const strukturController = require('../controllers/strukturController');
 const umkmController = require('../controllers/umkmController');
-const userController = require('../controllers/userController');
 const { ensureAuthenticated } = require('../middleware/authMiddleware');
 
 // Dashboard
 router.get('/dashboard', ensureAuthenticated, adminController.dashboard);
 
-// User Management CRUD
-router.get('/users', ensureAuthenticated, userController.list);
-router.get('/users/tambah', ensureAuthenticated, userController.showTambah);
-router.post('/users/tambah', ensureAuthenticated, userController.tambah);
-router.get('/users/edit/:id', ensureAuthenticated, userController.showEdit);
-router.post('/users/edit/:id', ensureAuthenticated, userController.edit);
-router.post('/users/hapus/:id', ensureAuthenticated, userController.hapus);
-router.get('/users/:id', ensureAuthenticated, userController.detail);
-router.post('/users/toggle-status/:id', ensureAuthenticated, userController.toggleStatus);
+// Admin Management CRUD
+router.get('/users', ensureAuthenticated, adminController.list);
+router.get('/users/tambah', ensureAuthenticated, adminController.showAdd);
+router.post('/users/tambah', ensureAuthenticated, adminController.uploadMiddleware, adminController.tambah);
+router.get('/users/detail/:id', ensureAuthenticated, adminController.detail);
+router.get('/users/edit/:id', ensureAuthenticated, adminController.showEdit);
+router.post('/users/edit/:id', ensureAuthenticated, adminController.uploadMiddleware, adminController.edit);
+router.post('/users/hapus/:id', ensureAuthenticated, adminController.hapus);
 
 // Kegiatan Management CRUD
 router.get('/kegiatan', ensureAuthenticated, kegiatanController.list);

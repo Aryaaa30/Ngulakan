@@ -1,110 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Daftar User</title>
+    <title>Daftar Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        function filterTabel() {
-            const nama = document.getElementById('filterNama').value.toLowerCase();
-            const email = document.getElementById('filterEmail').value.toLowerCase();
-            const role = document.getElementById('filterRole').value.toLowerCase();
-            const status = document.getElementById('filterStatus').value.toLowerCase();
-
-            const rows = document.querySelectorAll('#tabelUser tbody tr');
-            rows.forEach(row => {
-                const namaText = row.querySelector('[data-nama]').textContent.toLowerCase();
-                const emailText = row.querySelector('[data-email]').textContent.toLowerCase();
-                const roleText = row.querySelector('[data-role]').textContent.toLowerCase();
-                const statusText = row.querySelector('[data-status]').textContent.toLowerCase();
-
-                const cocok =
-                    namaText.includes(nama) &&
-                    emailText.includes(email) &&
-                    (role === 'semua' || roleText === role) &&
-                    (status === 'semua' || statusText === status);
-
-                row.style.display = cocok ? '' : 'none';
-            });
-        }
-
-        function resetFilter() {
-            document.getElementById('filterNama').value = '';
-            document.getElementById('filterEmail').value = '';
-            document.getElementById('filterRole').value = 'semua';
-            document.getElementById('filterStatus').value = 'semua';
-            filterTabel();
-        }
-
-        function toggleUserStatus(userId, currentStatus) {
-            const newStatus = currentStatus === 'Aktif' ? 'Nonaktif' : 'Aktif';
-            if (confirm(`Yakin ingin mengubah status user menjadi ${newStatus}?`)) {
-                fetch(`/admin/users/toggle-status/${userId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status: newStatus })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Gagal mengubah status user');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengubah status');
-                });
-            }
-        }
-
-        // Auto-hide messages after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            const messages = document.querySelectorAll('.message');
-            messages.forEach(message => {
-                setTimeout(() => {
-                    message.style.display = 'none';
-                }, 5000);
-            });
-        });
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-gray-50">
     <%- include('../../partials/navbar') %>
 
     <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Daftar User</h2>
-            <a href="/admin/users/tambah" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Tambah User</a>
+            <h2 class="text-2xl font-bold">Daftar Admin</h2>
+            <a href="/admin/users/tambah" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Tambah Admin
+            </a>
         </div>
 
-        <!-- Success/Error Messages -->
-        <% if (typeof req !== 'undefined' && req.query.success) { %>
-            <div class="message mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                <%= req.query.success %>
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                <%= success %>
             </div>
         <% } %>
 
-        <% if (typeof req !== 'undefined' && req.query.error) { %>
-            <div class="message mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                <%= req.query.error %>
-            </div>
-        <% } %>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <input type="text" id="filterNama" oninput="filterTabel()" placeholder="Cari Nama" class="border px-3 py-2 rounded" />
-            <input type="text" id="filterEmail" oninput="filterTabel()" placeholder="Cari Email" class="border px-3 py-2 rounded" />
-            <select id="filterRole" onchange="filterTabel()" class="border px-3 py-2 rounded">
-                <option value="semua">Semua Role</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-            </select>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="filterNama" oninput="filterTabel()" placeholder="Cari Nama Admin" class="border px-3 py-2 rounded" />
+            <input type="text" id="filterUsername" oninput="filterTabel()" placeholder="Cari Username" class="border px-3 py-2 rounded" />
             <select id="filterStatus" onchange="filterTabel()" class="border px-3 py-2 rounded">
                 <option value="semua">Semua Status</option>
-                <option value="aktif">Aktif</option>
-                <option value="nonaktif">Nonaktif</option>
+                <option value="Aktif">Aktif</option>
+                <option value="Tidak Aktif">Tidak Aktif</option>
             </select>
         </div>
         <div class="mb-4">
@@ -112,65 +42,175 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table id="tabelUser" class="min-w-full table-auto border text-sm">
+            <table id="tabelAdmin" class="min-w-full table-auto border text-sm">
                 <thead>
                     <tr class="bg-gray-200 text-left">
-                        <th class="px-3 py-2 border">Nama</th>
-                        <th class="px-3 py-2 border">Email</th>
-                        <th class="px-3 py-2 border">Role</th>
-                        <th class="px-3 py-2 border">Status</th>
-                        <th class="px-3 py-2 border">Tanggal Dibuat</th>
-                        <th class="px-3 py-2 border">Aksi</th>
+                        <th class="px-4 py-2 border">No</th>
+                        <th class="px-4 py-2 border">Foto</th>
+                        <th class="px-4 py-2 border">Nama</th>
+                        <th class="px-4 py-2 border">Username</th>
+                        <th class="px-4 py-2 border">Status</th>
+                        <th class="px-4 py-2 border">Tanggal Dibuat</th>
+                        <th class="px-4 py-2 border">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% if (users.length === 0) { %>
-                        <tr>
-                            <td colspan="6" class="px-3 py-4 text-center text-gray-500">Belum ada user yang terdaftar.</td>
-                        </tr>
+                    <% if (users && users.length > 0) { %>
+                        <% users.forEach((user, index) => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 border"><%= index + 1 %></td>
+                                <td class="px-4 py-2 border">
+                                    <% if (user.foto) { %>
+                                        <img src="/uploads/foto/admin/<%= user.foto %>" 
+                                             alt="Foto <%= user.nama %>" 
+                                             class="w-12 h-12 object-cover rounded">
+                                    <% } else { %>
+                                        <div class="w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600"></i>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 border" data-nama>
+                                    <a href="/admin/users/detail/<%= user.id_admin %>" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                                        <%= user.nama %>
+                                    </a>
+                                </td>
+                                <td class="px-4 py-2 border" data-username><%= user.username %></td>
+                                <td class="px-4 py-2 border" data-status>
+                                    <% if (user.status === 'Aktif') { %>
+                                        <span class="px-2 py-1 bg-green-500 text-white rounded text-xs">
+                                            <%= user.status %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="px-2 py-1 bg-red-500 text-white rounded text-xs">
+                                            <%= user.status %>
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 border" data-tanggal="<%= new Date(user.created_at).toISOString().split('T')[0] %>">
+                                    <%= new Date(user.created_at).toLocaleDateString('id-ID') %>
+                                </td>
+                                <td class="px-4 py-2 border">
+                                    <div class="flex space-x-2">
+                                        <a href="/admin/users/edit/<%= user.id_admin %>" 
+                                           class="px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600"
+                                           title="Edit">
+                                            Edit
+                                        </a>
+                                        <button onclick="confirmDelete('<%= user.id_admin %>', '<%= user.nama %>')"
+                                                class="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                                                title="Hapus">
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
                     <% } else { %>
-                        <% users.forEach(user => { %>
                         <tr>
-                            <td class="px-3 py-2 border" data-nama>
-                                <a href="/admin/users/<%= user._id %>" class="text-blue-600 hover:underline">
-                                    <%= user.nama %>
-                                </a>
-                            </td>
-                            <td class="px-3 py-2 border" data-email>
-                                <%= user.email %>
-                            </td>
-                            <td class="px-3 py-2 border" data-role>
-                                <span class="inline-block px-2 py-1 text-xs font-medium rounded-full 
-                                           <%= user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800' %>">
-                                    <%= user.role.charAt(0).toUpperCase() + user.role.slice(1) %>
-                                </span>
-                            </td>
-                            <td class="px-3 py-2 border" data-status>
-                                <span class="px-2 py-1 rounded text-xs <%= user.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
-                                    <%= user.status %>
-                                </span>
-                            </td>
-                            <td class="px-3 py-2 border">
-                                <%= new Date(user.created_at).toLocaleDateString('id-ID') %>
-                            </td>
-                            <td class="px-3 py-2 border">
-                                <div class="flex flex-wrap gap-2">
-                                    <a href="/admin/users/edit/<%= user._id %>" class="px-2 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500">Edit</a>
-                                    <button onclick="toggleUserStatus('<%= user._id %>', '<%= user.status %>')" 
-                                            class="px-2 py-1 <%= user.status === 'Aktif' ? 'bg-orange-500' : 'bg-green-500' %> text-white rounded hover:opacity-80">
-                                        <%= user.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan' %>
-                                    </button>
-                                    <form action="/admin/users/hapus/<%= user._id %>" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
-                                        <button type="submit" class="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">Hapus</button>
-                                    </form>
-                                </div>
+                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <br>Tidak ada data admin
                             </td>
                         </tr>
-                        <% }) %>
                     <% } %>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">Konfirmasi Hapus</h3>
+            <p class="mb-4">Apakah Anda yakin ingin menghapus admin <strong id="deleteName"></strong>?</p>
+            <p class="text-red-600 text-sm mb-4">Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Batal
+                </button>
+                <form id="deleteForm" method="POST" class="inline">
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterTabel() {
+            const nama = document.getElementById('filterNama').value.toLowerCase();
+            const username = document.getElementById('filterUsername').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#tabelAdmin tbody tr');
+            rows.forEach(row => {
+                // Skip empty message row
+                if (row.querySelector('td[colspan]')) {
+                    return;
+                }
+
+                const namaText = row.querySelector('[data-nama] a').textContent.trim().toLowerCase();
+                const usernameText = row.querySelector('[data-username]').textContent.trim().toLowerCase();
+                const statusText = row.querySelector('[data-status] span').textContent.trim().toLowerCase();
+
+                const cocok =
+                    (nama === '' || namaText.includes(nama)) &&
+                    (username === '' || usernameText.includes(username)) &&
+                    (status === 'semua' || statusText === status);
+
+                row.style.display = cocok ? '' : 'none';
+            });
+
+            // Update empty message if needed
+            updateEmptyMessage();
+        }
+
+        function updateEmptyMessage() {
+            const visibleRows = document.querySelectorAll('#tabelAdmin tbody tr:not([style*="display: none"])');
+            const emptyRow = document.querySelector('#tabelAdmin tbody tr td[colspan]');
+            
+            if (visibleRows.length === 0 && emptyRow) {
+                emptyRow.parentElement.style.display = '';
+                emptyRow.innerHTML = '<i class="fas fa-inbox text-4xl mb-2"></i><br>Tidak ada admin yang sesuai dengan filter.';
+            } else if (emptyRow) {
+                emptyRow.parentElement.style.display = 'none';
+            }
+        }
+
+        function resetFilter() {
+            document.getElementById('filterNama').value = '';
+            document.getElementById('filterUsername').value = '';
+            document.getElementById('filterStatus').value = 'semua';
+            filterTabel();
+        }
+
+        function confirmDelete(id, name) {
+            document.getElementById('deleteName').textContent = name;
+            document.getElementById('deleteForm').action = `/admin/users/hapus/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.bg-red-100, .bg-green-100');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
+
+            // Initialize filter
+            filterTabel();
+        });
+    </script>
 </body>
 </html> 

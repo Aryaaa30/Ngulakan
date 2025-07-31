@@ -1,62 +1,192 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit User</title>
+    <title>Edit Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-4xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Edit Admin</h2>
+            <a href="/admin/users" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                Kembali ke Daftar
+            </a>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/admin/users/edit/<%= user.id_admin %>" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nama Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="nama" 
+                           name="nama" 
+                           value="<%= user.nama %>"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Masukkan nama lengkap"
+                           required>
+                </div>
+
+                <div>
+                    <label for="foto" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-camera mr-2"></i>Foto Admin
+                    </label>
+                    <% if (user.foto) { %>
+                        <div class="mb-2">
+                            <img src="/uploads/foto/admin/<%= user.foto %>" 
+                                 alt="Foto saat ini" 
+                                 class="w-20 h-20 object-cover rounded border">
+                            <p class="text-xs text-gray-500 mt-1">Foto saat ini</p>
+                        </div>
+                    <% } %>
+                    <input type="file" 
+                           id="foto" 
+                           name="foto" 
+                           accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           onchange="validateFile(this)">
+                    <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF. Maksimal 2MB. Kosongkan jika tidak ingin mengubah foto.</p>
+                </div>
+
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                        Username <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           value="<%= user.username %>"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Masukkan username"
+                           required>
+                </div>
+
+                <div>
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        Password Baru (Opsional)
+                    </label>
+                    <div class="relative">
+                        <input type="password" 
+                               id="newPassword" 
+                               name="newPassword" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Kosongkan jika tidak ingin mengubah password">
+                        <button type="button" 
+                                id="togglePassword" 
+                                onclick="togglePasswordVisibility()"
+                                class="absolute right-2 top-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">Minimal 6 karakter jika diisi</p>
+                </div>
+
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                        Konfirmasi Password Baru
+                    </label>
+                    <div class="relative">
+                        <input type="password" 
+                               id="confirmPassword" 
+                               name="confirmPassword" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Ulangi password baru">
+                        <button type="button" 
+                                id="toggleConfirmPassword" 
+                                onclick="toggleConfirmPasswordVisibility()"
+                                class="absolute right-2 top-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                    </label>
+                    <select id="status" 
+                            name="status" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Aktif" <%= user.status === 'Aktif' ? 'selected' : '' %>>Aktif</option>
+                        <option value="Tidak Aktif" <%= user.status === 'Tidak Aktif' ? 'selected' : '' %>>Tidak Aktif</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="font-medium text-gray-700 mb-3">Informasi Admin</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">ID Admin:</span>
+                        <span class="text-gray-900 ml-2"><%= user.id_admin %></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Dibuat:</span>
+                        <span class="text-gray-900 ml-2"><%= new Date(user.created_at).toLocaleString('id-ID') %></span>
+                    </div>
+                    <% if (user.updated_at) { %>
+                        <div>
+                            <span class="text-gray-500">Terakhir diupdate:</span>
+                            <span class="text-gray-900 ml-2"><%= new Date(user.updated_at).toLocaleString('id-ID') %></span>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+                <button type="button" 
+                        onclick="clearPasswordFields()" 
+                        class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Reset Password
+                </button>
+                <a href="/admin/users" 
+                   class="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    Batal
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Update Admin
+                </button>
+            </div>
+        </form>
+    </div>
+
     <script>
-        function validateForm() {
-            const nama = document.getElementById('nama').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const role = document.getElementById('role').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (!nama) {
-                alert('Nama harus diisi');
-                return false;
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById('newPassword');
+            const toggleBtn = document.getElementById('togglePassword');
+            const icon = toggleBtn.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordField.type = 'password';
+                icon.className = 'fas fa-eye';
             }
-
-            if (!email) {
-                alert('Email harus diisi');
-                return false;
-            }
-
-            if (!email.includes('@')) {
-                alert('Email tidak valid');
-                return false;
-            }
-
-            if (newPassword && newPassword.length < 6) {
-                alert('Password baru minimal 6 karakter');
-                return false;
-            }
-
-            if (newPassword && newPassword !== confirmPassword) {
-                alert('Konfirmasi password tidak cocok');
-                return false;
-            }
-
-            if (!role) {
-                alert('Role harus dipilih');
-                return false;
-            }
-
-            return true;
         }
 
-        function togglePasswordVisibility() {
-            const newPasswordField = document.getElementById('newPassword');
+        function toggleConfirmPasswordVisibility() {
             const confirmPasswordField = document.getElementById('confirmPassword');
-            const toggleBtn = document.getElementById('togglePassword');
+            const toggleBtn = document.getElementById('toggleConfirmPassword');
+            const icon = toggleBtn.querySelector('i');
             
-            if (newPasswordField.type === 'password') {
-                newPasswordField.type = 'text';
+            if (confirmPasswordField.type === 'password') {
                 confirmPasswordField.type = 'text';
-                toggleBtn.textContent = 'Sembunyikan Password';
+                icon.className = 'fas fa-eye-slash';
             } else {
-                newPasswordField.type = 'password';
                 confirmPasswordField.type = 'password';
-                toggleBtn.textContent = 'Tampilkan Password';
+                icon.className = 'fas fa-eye';
             }
         }
 
@@ -64,105 +194,56 @@
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
         }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword && newPassword.length < 6) {
+                e.preventDefault();
+                alert('Password baru minimal 6 karakter!');
+                return false;
+            }
+            
+            if (newPassword && newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('Konfirmasi password tidak cocok!');
+                return false;
+            }
+        });
+
+        // File validation
+        function validateFile(input) {
+            const file = input.files[0];
+            if (file) {
+                // Check file size (2MB = 2 * 1024 * 1024 bytes)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran file terlalu besar. Maksimal 2MB.');
+                    input.value = '';
+                    return false;
+                }
+                
+                // Check file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.');
+                    input.value = '';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.bg-red-100');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
+        });
     </script>
-</head>
-<body class="bg-gray-50">
-    <%- include('../../partials/navbar') %>
-
-    <div class="max-w-2xl mx-auto mt-8 p-8 bg-white rounded shadow">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Edit User</h2>
-            <a href="/admin/users" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Kembali</a>
-        </div>
-
-        <% if (typeof error !== 'undefined' && error) { %>
-            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                <%= error %>
-            </div>
-        <% } %>
-
-        <% if (typeof success !== 'undefined' && success) { %>
-            <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                <%= success %>
-            </div>
-        <% } %>
-
-        <form action="/admin/users/edit/<%= user._id %>" method="POST" onsubmit="return validateForm()">
-            <div class="mb-4">
-                <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
-                <input type="text" id="nama" name="nama" value="<%= user.nama %>" required 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Masukkan nama lengkap">
-            </div>
-
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                <input type="email" id="email" name="email" value="<%= user.email %>" required 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Masukkan email">
-            </div>
-
-            <div class="mb-4">
-                <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">Password Baru (Opsional)</label>
-                <div class="relative">
-                    <input type="password" id="newPassword" name="newPassword" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                           placeholder="Kosongkan jika tidak ingin mengubah password">
-                    <button type="button" id="togglePassword" onclick="togglePasswordVisibility()"
-                            class="absolute right-2 top-2 text-gray-500 hover:text-gray-700">
-                        Tampilkan Password
-                    </button>
-                </div>
-                <p class="text-sm text-gray-500 mt-1">Minimal 6 karakter jika diisi</p>
-            </div>
-
-            <div class="mb-4">
-                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" 
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Ulangi password baru">
-            </div>
-
-            <div class="mb-4">
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                <select id="role" name="role" required 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Pilih Role</option>
-                    <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
-                    <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
-                </select>
-            </div>
-
-            <div class="mb-6">
-                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                <select id="status" name="status" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="Aktif" <%= user.status === 'Aktif' ? 'selected' : '' %>>Aktif</option>
-                    <option value="Nonaktif" <%= user.status === 'Nonaktif' ? 'selected' : '' %>>Nonaktif</option>
-                </select>
-            </div>
-
-            <div class="mb-4 p-4 bg-gray-100 rounded">
-                <h3 class="font-medium text-gray-700 mb-2">Informasi User</h3>
-                <p class="text-sm text-gray-600">ID: <%= user._id %></p>
-                <p class="text-sm text-gray-600">Dibuat: <%= new Date(user.created_at).toLocaleString('id-ID') %></p>
-                <% if (user.updated_at) { %>
-                    <p class="text-sm text-gray-600">Terakhir diupdate: <%= new Date(user.updated_at).toLocaleString('id-ID') %></p>
-                <% } %>
-            </div>
-
-            <div class="flex gap-4">
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Update User
-                </button>
-                <button type="button" onclick="clearPasswordFields()" class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                    Reset Password
-                </button>
-                <a href="/admin/users" class="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                    Batal
-                </a>
-            </div>
-        </form>
-    </div>
 </body>
 </html> 
