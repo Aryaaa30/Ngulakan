@@ -31,13 +31,25 @@ const umkmModel = {
 
   update: async (id, data) => {
     const { nama_umkm, kategori_umkm, nama_pemilik, alamat, deskripsi, kontak, foto, status } = data;
-    await pool.query(
-      `UPDATE umkm SET
-         nama_umkm = ?, kategori_umkm = ?, nama_pemilik = ?, alamat = ?,
-         deskripsi = ?, kontak = ?, foto = ?, status = ?
-       WHERE id_umkm = ?`,
-      [nama_umkm, kategori_umkm, nama_pemilik, alamat, deskripsi, kontak, foto, status, id]
-    );
+    
+    // If foto is not provided, don't update it
+    if (foto !== undefined) {
+      await pool.query(
+        `UPDATE umkm SET
+           nama_umkm = ?, kategori_umkm = ?, nama_pemilik = ?, alamat = ?,
+           deskripsi = ?, kontak = ?, foto = ?, status = ?
+         WHERE id_umkm = ?`,
+        [nama_umkm, kategori_umkm, nama_pemilik, alamat, deskripsi, kontak, foto, status, id]
+      );
+    } else {
+      await pool.query(
+        `UPDATE umkm SET
+           nama_umkm = ?, kategori_umkm = ?, nama_pemilik = ?, alamat = ?,
+           deskripsi = ?, kontak = ?, status = ?
+         WHERE id_umkm = ?`,
+        [nama_umkm, kategori_umkm, nama_pemilik, alamat, deskripsi, kontak, status, id]
+      );
+    }
     return { id_umkm: id };
   },
 

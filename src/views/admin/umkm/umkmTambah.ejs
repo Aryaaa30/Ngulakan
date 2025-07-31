@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah UMKM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-4xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Tambah UMKM</h2>
+            <a href="/admin/umkm" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                Kembali ke Daftar
+            </a>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/admin/umkm/tambah" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="nama_umkm" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nama UMKM <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="nama_umkm" 
+                           name="nama_umkm" 
+                           value="<%= typeof nama_umkm !== 'undefined' ? nama_umkm : '' %>"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <div>
+                    <label for="kategori_umkm" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <select id="kategori_umkm" 
+                            name="kategori_umkm" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Makanan" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Makanan') ? 'selected' : '' %>>Makanan</option>
+                        <option value="Tekstil" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Tekstil') ? 'selected' : '' %>>Tekstil</option>
+                        <option value="Aksesoris" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Aksesoris') ? 'selected' : '' %>>Aksesoris</option>
+                        <option value="Kerajinan" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Kerajinan') ? 'selected' : '' %>>Kerajinan</option>
+                        <option value="Jasa" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Jasa') ? 'selected' : '' %>>Jasa</option>
+                        <option value="Pertanian" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Pertanian') ? 'selected' : '' %>>Pertanian</option>
+                        <option value="Lainnya" <%= (typeof kategori_umkm !== 'undefined' && kategori_umkm === 'Lainnya') ? 'selected' : '' %>>Lainnya</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="nama_pemilik" class="block text-sm font-medium text-gray-700 mb-2">
+                        Nama Pemilik <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="nama_pemilik" 
+                           name="nama_pemilik" 
+                           value="<%= typeof nama_pemilik !== 'undefined' ? nama_pemilik : '' %>"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <div>
+                    <label for="kontak" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kontak
+                    </label>
+                    <input type="text" 
+                           id="kontak" 
+                           name="kontak" 
+                           value="<%= typeof kontak !== 'undefined' ? kontak : '' %>"
+                           placeholder="Nomor telepon atau WhatsApp"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">
+                        Alamat <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="alamat" 
+                              name="alamat" 
+                              rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              required><%= typeof alamat !== 'undefined' ? alamat : '' %></textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label for="deskripsi" class="block text-sm font-medium text-gray-700 mb-2">
+                        Deskripsi
+                    </label>
+                    <textarea id="deskripsi" 
+                              name="deskripsi" 
+                              rows="4"
+                              placeholder="Deskripsi produk atau layanan UMKM"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"><%= typeof deskripsi !== 'undefined' ? deskripsi : '' %></textarea>
+                </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                    </label>
+                    <select id="status" 
+                            name="status" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Aktif" <%= (typeof status !== 'undefined' && status === 'Aktif') ? 'selected' : '' %>>Aktif</option>
+                        <option value="Tidak Aktif" <%= (typeof status !== 'undefined' && status === 'Tidak Aktif') ? 'selected' : '' %>>Tidak Aktif</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="foto" class="block text-sm font-medium text-gray-700 mb-2">
+                        Foto UMKM
+                    </label>
+                    <input type="file" 
+                           id="foto" 
+                           name="foto" 
+                           accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG, GIF. Maksimal 2MB.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+                <a href="/admin/umkm" 
+                   class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Batal
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Simpan UMKM
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Preview image before upload
+        document.getElementById('foto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Ukuran file maksimal 2MB!');
+                    this.value = '';
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Hanya file gambar yang diperbolehkan!');
+                    this.value = '';
+                    return;
+                }
+            }
+        });
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.bg-red-100');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html> 

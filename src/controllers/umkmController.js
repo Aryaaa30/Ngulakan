@@ -1,10 +1,81 @@
 const umkmModel = require('../models/umkmModel');
+const path = require('path');
+const multer = require('multer');
+
+// Setup Multer untuk upload foto UMKM
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../uploads/foto/umkm'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB
+    fileFilter: function (req, file, cb) {
+        // Check file type
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Hanya file gambar yang diperbolehkan!'), false);
+        }
+    }
+});
+
+// Middleware untuk handle upload
+exports.uploadMiddleware = (req, res, next) => {
+    upload.single('foto')(req, res, function (err) {
+        if (err) {
+            const formData = {
+                user: req.session.user,
+                error: '',
+                nama_umkm: req.body.nama_umkm || '',
+                kategori_umkm: req.body.kategori_umkm || '',
+                nama_pemilik: req.body.nama_pemilik || '',
+                alamat: req.body.alamat || '',
+                kontak: req.body.kontak || '',
+                deskripsi: req.body.deskripsi || '',
+                status: req.body.status || 'Aktif',
+                currentPath: req.path
+            };
+
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                formData.error = 'Ukuran file foto maksimal 2 MB!';
+            } else if (err.message === 'Hanya file gambar yang diperbolehkan!') {
+                formData.error = 'Hanya file gambar (JPG, PNG, GIF) yang diperbolehkan!';
+            }
+
+            // Determine which form to render based on the path
+            if (req.path.includes('/edit/')) {
+                formData.umkm = { id_umkm: req.params.id, ...formData };
+                return res.render('admin/umkm/umkmEdit', formData);
+            } else {
+                return res.render('admin/umkm/umkmTambah', formData);
+            }
+        }
+        next();
+    });
+};
 
 // Get all UMKM (for admin list view)
 exports.list = async (req, res) => {
   try {
     const umkm = await umkmModel.getAll();
-    res.render('admin/umkm/umkmList', { umkm, user: req.session.user, currentPath: req.path });
+    
+    // Get success/error messages from query params
+    const success = req.query.success;
+    const error = req.query.error;
+    
+    res.render('admin/umkm/umkmList', { 
+      umkm, 
+      user: req.session.user, 
+      currentPath: req.path,
+      success,
+      error
+    });
   } catch (error) {
     console.error('Error fetching UMKM:', error);
     res.status(500).render('admin/umkm/umkmList', { 
@@ -24,12 +95,25 @@ exports.showTambah = (req, res) => {
 // Add new UMKM
 exports.tambah = async (req, res) => {
   try {
-    const { nama, deskripsi, alamat, kontak, kategori, status } = req.body;
+    const { nama_umkm, deskripsi, alamat, kontak, kategori_umkm, status, nama_pemilik } = req.body;
+    let foto = null;
+
+    // Handle file upload
+    if (req.file) {
+      foto = req.file.filename;
+    }
 
     // Validation
-    if (!nama || !deskripsi || !alamat) {
+    if (!nama_umkm || !alamat || !nama_pemilik) {
       return res.render('admin/umkm/umkmTambah', {
-        error: 'Nama, deskripsi, dan alamat wajib diisi',
+        error: 'Nama UMKM, alamat, dan nama pemilik wajib diisi',
+        nama_umkm: nama_umkm || '',
+        kategori_umkm: kategori_umkm || '',
+        nama_pemilik: nama_pemilik || '',
+        alamat: alamat || '',
+        kontak: kontak || '',
+        deskripsi: deskripsi || '',
+        status: status || 'Aktif',
         user: req.session.user,
         currentPath: req.path
       });
@@ -37,12 +121,14 @@ exports.tambah = async (req, res) => {
 
     // Create UMKM
     const newUmkm = {
-      nama_umkm: nama,
-      deskripsi_umkm: deskripsi,
-      alamat_umkm: alamat,
-      kontak_umkm: kontak || '',
-      kategori_umkm: kategori || 'Lainnya',
-      status_umkm: status || 'Aktif'
+      nama_umkm: nama_umkm,
+      kategori_umkm: kategori_umkm || 'Lainnya',
+      nama_pemilik: nama_pemilik,
+      alamat: alamat,
+      deskripsi: deskripsi || null,
+      kontak: kontak || null,
+      foto: foto,
+      status: status || 'Aktif'
     };
 
     await umkmModel.create(newUmkm);
@@ -52,6 +138,13 @@ exports.tambah = async (req, res) => {
     console.error('Error adding UMKM:', error);
     res.render('admin/umkm/umkmTambah', {
       error: 'Gagal menambahkan UMKM',
+      nama_umkm: req.body.nama_umkm || '',
+      kategori_umkm: req.body.kategori_umkm || '',
+      nama_pemilik: req.body.nama_pemilik || '',
+      alamat: req.body.alamat || '',
+      kontak: req.body.kontak || '',
+      deskripsi: req.body.deskripsi || '',
+      status: req.body.status || 'Aktif',
       user: req.session.user,
       currentPath: req.path
     });
@@ -75,14 +168,20 @@ exports.showEdit = async (req, res) => {
 // Update UMKM
 exports.edit = async (req, res) => {
   try {
-    const { nama, deskripsi, alamat, kontak, kategori, status } = req.body;
+    const { nama_umkm, deskripsi, alamat, kontak, kategori_umkm, status, nama_pemilik } = req.body;
     const umkmId = req.params.id;
+    let foto = null;
+
+    // Handle file upload
+    if (req.file) {
+      foto = req.file.filename;
+    }
 
     // Validation
-    if (!nama || !deskripsi || !alamat) {
+    if (!nama_umkm || !alamat || !nama_pemilik) {
       return res.render('admin/umkm/umkmEdit', {
-        umkm: { id_umkm: umkmId, nama_umkm: nama, deskripsi_umkm: deskripsi, alamat_umkm: alamat, kontak_umkm: kontak, kategori_umkm: kategori, status_umkm: status },
-        error: 'Nama, deskripsi, dan alamat wajib diisi',
+        umkm: { id_umkm: umkmId, nama_umkm: nama_umkm, deskripsi: deskripsi, alamat: alamat, kontak: kontak, kategori_umkm: kategori_umkm, status: status, nama_pemilik: nama_pemilik },
+        error: 'Nama UMKM, alamat, dan nama pemilik wajib diisi',
         user: req.session.user,
         currentPath: req.path
       });
@@ -90,13 +189,21 @@ exports.edit = async (req, res) => {
 
     // Update UMKM data
     const updateData = {
-      nama_umkm: nama,
-      deskripsi_umkm: deskripsi,
-      alamat_umkm: alamat,
-      kontak_umkm: kontak || '',
-      kategori_umkm: kategori || 'Lainnya',
-      status_umkm: status || 'Aktif'
+      nama_umkm: nama_umkm,
+      kategori_umkm: kategori_umkm || 'Lainnya',
+      nama_pemilik: nama_pemilik,
+      alamat: alamat,
+      deskripsi: deskripsi || null,
+      kontak: kontak || null,
+      status: status || 'Aktif'
     };
+
+    // Only update foto if new file is uploaded
+    if (foto) {
+      updateData.foto = foto;
+    } else {
+      updateData.foto = undefined; // This will prevent foto from being updated
+    }
 
     await umkmModel.update(umkmId, updateData);
 
@@ -104,7 +211,7 @@ exports.edit = async (req, res) => {
   } catch (error) {
     console.error('Error updating UMKM:', error);
     res.render('admin/umkm/umkmEdit', {
-      umkm: { id_umkm: req.params.id, ...req.body },
+      umkm: { id_umkm: req.params.id, nama_umkm: req.body.nama_umkm, deskripsi: req.body.deskripsi, alamat: req.body.alamat, kontak: req.body.kontak, kategori_umkm: req.body.kategori_umkm, status: req.body.status, nama_pemilik: req.body.nama_pemilik },
       error: 'Gagal mengupdate UMKM',
       user: req.session.user,
       currentPath: req.path

@@ -52,10 +52,10 @@ router.post('/struktur/hapus/:id', ensureAuthenticated, strukturController.hapus
 // UMKM Management CRUD
 router.get('/umkm', ensureAuthenticated, umkmController.list);
 router.get('/umkm/tambah', ensureAuthenticated, umkmController.showTambah);
-router.post('/umkm/tambah', ensureAuthenticated, umkmController.tambah);
+router.post('/umkm/tambah', ensureAuthenticated, umkmController.uploadMiddleware, umkmController.tambah);
+router.get('/umkm/detail/:id', ensureAuthenticated, umkmController.detail);
 router.get('/umkm/edit/:id', ensureAuthenticated, umkmController.showEdit);
-router.post('/umkm/edit/:id', ensureAuthenticated, umkmController.edit);
+router.post('/umkm/edit/:id', ensureAuthenticated, umkmController.uploadMiddleware, umkmController.edit);
 router.post('/umkm/hapus/:id', ensureAuthenticated, umkmController.hapus);
-router.get('/umkm/:id', ensureAuthenticated, umkmController.detail);
 
 module.exports = router;

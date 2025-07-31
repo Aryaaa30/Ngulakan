@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detail UMKM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Detail UMKM</h2>
+            <div class="flex space-x-2">
+                <a href="/admin/umkm/edit/<%= umkm.id_umkm %>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                    Edit
+                </a>
+                <a href="/admin/umkm" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                    Kembali
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1">
+                <div class="bg-white border rounded-lg p-6 text-center">
+                    <% if (umkm.foto) { %>
+                        <img src="/uploads/foto/umkm/<%= umkm.foto %>" 
+                             alt="Foto <%= umkm.nama_umkm %>" 
+                             class="w-full h-64 object-cover rounded mb-4">
+                    <% } else { %>
+                        <div class="w-full h-64 bg-gray-300 rounded mb-4 flex items-center justify-center">
+                            <i class="fas fa-store text-6xl text-gray-600"></i>
+                        </div>
+                    <% } %>
+                    <h3 class="text-xl font-bold mb-2"><%= umkm.nama_umkm %></h3>
+                    <span class="px-3 py-1 bg-green-500 text-white rounded-full text-sm mb-2">
+                        <%= umkm.kategori_umkm %>
+                    </span>
+                    <div class="mt-2">
+                        <% if (umkm.status === 'Aktif') { %>
+                            <span class="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+                                <%= umkm.status %>
+                            </span>
+                        <% } else { %>
+                            <span class="px-3 py-1 bg-red-500 text-white rounded-full text-sm">
+                                <%= umkm.status %>
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:col-span-2">
+                <div class="bg-white border rounded-lg p-6">
+                    <h3 class="text-lg font-bold mb-4">Informasi UMKM</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <dl class="space-y-3">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">ID UMKM:</dt>
+                                    <dd class="text-sm text-gray-900"><%= umkm.id_umkm %></dd>
+                                </div>
+                                
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Nama UMKM:</dt>
+                                    <dd class="text-sm text-gray-900"><%= umkm.nama_umkm %></dd>
+                                </div>
+                                
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Kategori:</dt>
+                                    <dd class="text-sm">
+                                        <span class="px-2 py-1 bg-green-500 text-white rounded text-xs">
+                                            <%= umkm.kategori_umkm %>
+                                        </span>
+                                    </dd>
+                                </div>
+
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Nama Pemilik:</dt>
+                                    <dd class="text-sm text-gray-900"><%= umkm.nama_pemilik %></dd>
+                                </div>
+                            </dl>
+                        </div>
+                        
+                        <div>
+                            <dl class="space-y-3">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Kontak:</dt>
+                                    <dd class="text-sm">
+                                        <% if (umkm.kontak) { %>
+                                            <a href="tel:<%= umkm.kontak %>" class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-phone mr-1"></i><%= umkm.kontak %>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="text-gray-400">-</span>
+                                        <% } %>
+                                    </dd>
+                                </div>
+                                
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Status:</dt>
+                                    <dd class="text-sm">
+                                        <% if (umkm.status === 'Aktif') { %>
+                                            <span class="px-2 py-1 bg-green-500 text-white rounded text-xs">
+                                                <%= umkm.status %>
+                                            </span>
+                                        <% } else { %>
+                                            <span class="px-2 py-1 bg-red-500 text-white rounded text-xs">
+                                                <%= umkm.status %>
+                                            </span>
+                                        <% } %>
+                                    </dd>
+                                </div>
+                                
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Dibuat:</dt>
+                                    <dd class="text-sm text-gray-900">
+                                        <%= new Date(umkm.created_at).toLocaleString('id-ID') %>
+                                    </dd>
+                                </div>
+                                
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Diupdate:</dt>
+                                    <dd class="text-sm text-gray-900">
+                                        <%= new Date(umkm.updated_at).toLocaleString('id-ID') %>
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <dt class="text-sm font-medium text-gray-500 mb-2">Alamat:</dt>
+                        <dd class="text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                            <%= umkm.alamat %>
+                        </dd>
+                    </div>
+
+                    <% if (umkm.deskripsi) { %>
+                        <div class="mt-6">
+                            <dt class="text-sm font-medium text-gray-500 mb-2">Deskripsi:</dt>
+                            <dd class="text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                                <%= umkm.deskripsi %>
+                            </dd>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <div class="bg-white border rounded-lg p-6 mt-4">
+                    <h3 class="text-lg font-bold mb-4">Aksi</h3>
+                    <div class="flex space-x-2">
+                        <a href="/admin/umkm/edit/<%= umkm.id_umkm %>" 
+                           class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                            Edit UMKM
+                        </a>
+                        <button onclick="confirmDelete(<%= umkm.id_umkm %>, '<%= umkm.nama_umkm %>')"
+                                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                            Hapus UMKM
+                        </button>
+                        <a href="/admin/umkm" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                            Kembali ke Daftar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">Konfirmasi Hapus</h3>
+            <p class="mb-4">Apakah Anda yakin ingin menghapus UMKM <strong id="deleteName"></strong>?</p>
+            <p class="text-red-600 text-sm mb-4">Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Batal
+                </button>
+                <form id="deleteForm" method="POST" class="inline">
+                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(id, name) {
+            document.getElementById('deleteName').textContent = name;
+            document.getElementById('deleteForm').action = `/admin/umkm/hapus/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html> 
