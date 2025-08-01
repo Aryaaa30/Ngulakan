@@ -50,7 +50,6 @@
                         <th class="px-4 py-2 border">Nama</th>
                         <th class="px-4 py-2 border">Username</th>
                         <th class="px-4 py-2 border">Status</th>
-                        <th class="px-4 py-2 border">Tanggal Dibuat</th>
                         <th class="px-4 py-2 border">Aksi</th>
                     </tr>
                 </thead>
@@ -78,18 +77,12 @@
                                 </td>
                                 <td class="px-4 py-2 border" data-username><%= user.username %></td>
                                 <td class="px-4 py-2 border" data-status>
-                                    <% if (user.status === 'Aktif') { %>
-                                        <span class="px-2 py-1 bg-green-500 text-white rounded text-xs">
+                                    <form method="POST" action="/admin/users/toggle-status/<%= user.id_admin %>" style="display:inline">
+                                        <button type="submit" class="px-2 py-1 rounded text-xs focus:outline-none
+                                            <%= user.status === 'Aktif' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-red-500 text-white hover:bg-red-600' %>">
                                             <%= user.status %>
-                                        </span>
-                                    <% } else { %>
-                                        <span class="px-2 py-1 bg-red-500 text-white rounded text-xs">
-                                            <%= user.status %>
-                                        </span>
-                                    <% } %>
-                                </td>
-                                <td class="px-4 py-2 border" data-tanggal="<%= new Date(user.created_at).toISOString().split('T')[0] %>">
-                                    <%= new Date(user.created_at).toLocaleDateString('id-ID') %>
+                                        </button>
+                                    </form>
                                 </td>
                                 <td class="px-4 py-2 border">
                                     <div class="flex space-x-2">
@@ -154,7 +147,7 @@
 
                 const namaText = row.querySelector('[data-nama] a').textContent.trim().toLowerCase();
                 const usernameText = row.querySelector('[data-username]').textContent.trim().toLowerCase();
-                const statusText = row.querySelector('[data-status] span').textContent.trim().toLowerCase();
+                const statusText = row.querySelector('[data-status] button').textContent.trim().toLowerCase();
 
                 const cocok =
                     (nama === '' || namaText.includes(nama)) &&

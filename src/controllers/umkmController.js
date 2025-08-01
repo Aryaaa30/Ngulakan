@@ -1,3 +1,19 @@
+// Toggle status Aktif/Tidak Aktif
+exports.toggleStatus = async (req, res) => {
+  try {
+    const umkmId = req.params.id;
+    const umkm = await umkmModel.getById(umkmId);
+    if (!umkm) {
+      return res.redirect('/admin/umkm?error=UMKM tidak ditemukan');
+    }
+    const newStatus = umkm.status === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
+    await umkmModel.update(umkmId, { ...umkm, status: newStatus });
+    res.redirect('/admin/umkm?success=Status UMKM berhasil diubah');
+  } catch (error) {
+    console.error('Error toggling status:', error);
+    res.redirect('/admin/umkm?error=Gagal mengubah status UMKM');
+  }
+};
 const umkmModel = require('../models/umkmModel');
 const path = require('path');
 const multer = require('multer');
@@ -226,8 +242,9 @@ exports.detail = async (req, res) => {
     if (!umkm) {
       return res.redirect('/admin/umkm?error=UMKM tidak ditemukan');
     }
-
-    res.render('admin/umkm/umkmDetail', { umkm, user: req.session.user, currentPath: req.path });
+    // Ambil semua UMKM untuk sidebar
+    const umkmList = await umkmModel.getAll();
+    res.render('admin/umkm/umkmDetail', { umkm, umkmList, user: req.session.user, currentPath: req.path });
   } catch (error) {
     console.error('Error fetching UMKM detail:', error);
     res.redirect('/admin/umkm?error=Gagal memuat detail UMKM');

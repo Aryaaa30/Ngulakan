@@ -18,6 +18,7 @@ router.get('/users/detail/:id', ensureAuthenticated, adminController.detail);
 router.get('/users/edit/:id', ensureAuthenticated, adminController.showEdit);
 router.post('/users/edit/:id', ensureAuthenticated, adminController.uploadMiddleware, adminController.edit);
 router.post('/users/hapus/:id', ensureAuthenticated, adminController.hapus);
+router.post('/users/toggle-status/:id', ensureAuthenticated, adminController.toggleStatus);
 
 // Kegiatan Management CRUD
 router.get('/kegiatan', ensureAuthenticated, kegiatanController.list);
@@ -56,5 +57,6 @@ router.get('/umkm/detail/:id', ensureAuthenticated, umkmController.detail);
 router.get('/umkm/edit/:id', ensureAuthenticated, umkmController.showEdit);
 router.post('/umkm/edit/:id', ensureAuthenticated, umkmController.uploadMiddleware, umkmController.edit);
 router.post('/umkm/hapus/:id', ensureAuthenticated, umkmController.hapus);
+router.post('/umkm/toggle-status/:id', ensureAuthenticated, umkmController.toggleStatus);
 
 module.exports = router;

@@ -202,8 +202,9 @@ exports.detail = async (req, res) => {
     if (!struktur) {
       return res.redirect('/admin/struktur?error=Struktur tidak ditemukan');
     }
-
-    res.render('admin/struktur/strukturDetail', { struktur, user: req.session.user, currentPath: req.path });
+    // Ambil semua struktur untuk sidebar
+    const strukturList = await strukturModel.getAll();
+    res.render('admin/struktur/strukturDetail', { struktur, strukturList, user: req.session.user, currentPath: req.path });
   } catch (error) {
     console.error('Error fetching struktur detail:', error);
     res.redirect('/admin/struktur?error=Gagal memuat detail struktur');

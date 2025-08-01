@@ -36,7 +36,7 @@
                 <option value="ketua rt">Ketua RT</option>
                 <option value="ketua rw">Ketua RW</option>
             </select>
-            <input type="date" id="filterTanggal" onchange="filterTabel()" class="border px-3 py-2 rounded" />
+            <input type="text" id="filterKontak" oninput="filterTabel()" placeholder="Cari Kontak" class="border px-3 py-2 rounded" />
         </div>
         <div class="mb-4">
             <button onclick="resetFilter()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Reset Filter</button>
@@ -51,7 +51,6 @@
                         <th class="px-4 py-2 border">Nama</th>
                         <th class="px-4 py-2 border">Jabatan</th>
                         <th class="px-4 py-2 border">Kontak</th>
-                        <th class="px-4 py-2 border">Tanggal Dibuat</th>
                         <th class="px-4 py-2 border">Aksi</th>
                     </tr>
                 </thead>
@@ -78,11 +77,26 @@
                                     </a>
                                 </td>
                                 <td class="px-4 py-2 border" data-jabatan>
-                                    <span class="px-2 py-1 bg-blue-500 text-white rounded text-xs">
+                                    <% let jabatanColor = 'bg-gray-400';
+                                    if (item.jabatan.toLowerCase() === 'dukuh') {
+                                        jabatanColor = 'bg-green-600';
+                                    } else if (item.jabatan.toLowerCase() === 'ketua rt') {
+                                        jabatanColor = 'bg-yellow-500';
+                                    } else if (item.jabatan.toLowerCase() === 'ketua rw') {
+                                        jabatanColor = 'bg-blue-500';
+                                    } else if (item.jabatan.toLowerCase() === 'sekretaris') {
+                                        jabatanColor = 'bg-purple-500';
+                                    } else if (item.jabatan.toLowerCase() === 'bendahara') {
+                                        jabatanColor = 'bg-pink-500';
+                                    } else if (item.jabatan.toLowerCase() === 'anggota') {
+                                        jabatanColor = 'bg-teal-500';
+                                    }
+                                    %>
+                                    <span class="px-2 py-1 <%= jabatanColor %> text-white rounded text-xs">
                                         <%= item.jabatan %>
                                     </span>
                                 </td>
-                                <td class="px-4 py-2 border">
+                                <td class="px-4 py-2 border" data-kontak>
                                     <% if (item.kontak) { %>
                                         <a href="tel:<%= item.kontak %>" class="text-blue-600 hover:text-blue-800">
                                             <i class="fas fa-phone mr-1"></i><%= item.kontak %>
@@ -91,9 +105,6 @@
                                         <span class="text-gray-400">-</span>
                                     <% } %>
                                 </td>
-                                <td class="px-4 py-2 border" data-tanggal="<%= new Date(item.created_at).toISOString().split('T')[0] %>">
-                                    <%= new Date(item.created_at).toLocaleDateString('id-ID') %>
-                                </td>
                                 <td class="px-4 py-2 border">
                                     <div class="flex space-x-2">
                                         <a href="/admin/struktur/edit/<%= item.id_struktur %>" 
@@ -101,7 +112,7 @@
                                            title="Edit">
                                             Edit
                                         </a>
-                                        <button onclick="confirmDelete(<%= item.id_struktur %>, `<%= item.nama %>`)"
+                                        <button onclick="confirmDelete(<%= item.id_struktur %>, '<%= item.nama %>')"
                                                 class="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
                                                 title="Hapus">
                                             Hapus
@@ -112,7 +123,7 @@
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                                 <i class="fas fa-inbox text-4xl mb-2"></i>
                                 <br>Tidak ada data struktur
                             </td>
@@ -146,7 +157,7 @@
         function filterTabel() {
             const nama = document.getElementById('filterNama').value.toLowerCase();
             const jabatan = document.getElementById('filterJabatan').value.toLowerCase();
-            const tanggal = document.getElementById('filterTanggal').value;
+            const kontak = document.getElementById('filterKontak').value.toLowerCase();
 
             const rows = document.querySelectorAll('#tabelStruktur tbody tr');
             rows.forEach(row => {
@@ -157,12 +168,12 @@
 
                 const namaText = row.querySelector('[data-nama] a').textContent.trim().toLowerCase();
                 const jabatanText = row.querySelector('[data-jabatan] span').textContent.trim().toLowerCase();
-                const tanggalVal = row.querySelector('[data-tanggal]').getAttribute('data-tanggal');
+                const kontakText = row.querySelector('[data-kontak]')?.textContent.trim().toLowerCase() || '';
 
                 const cocok =
                     (nama === '' || namaText.includes(nama)) &&
                     (jabatan === 'semua' || jabatanText === jabatan) &&
-                    (tanggal === '' || tanggalVal === tanggal);
+                    (kontak === '' || kontakText.includes(kontak));
 
                 row.style.display = cocok ? '' : 'none';
             });
@@ -186,7 +197,7 @@
         function resetFilter() {
             document.getElementById('filterNama').value = '';
             document.getElementById('filterJabatan').value = 'semua';
-            document.getElementById('filterTanggal').value = '';
+            document.getElementById('filterKontak').value = '';
             filterTabel();
         }
 

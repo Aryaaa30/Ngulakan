@@ -1,3 +1,25 @@
+// Toggle Status Admin
+exports.toggleStatus = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+        const admin = await adminModel.getById(adminId);
+        if (!admin) {
+            return res.redirect('/admin/users?error=Admin tidak ditemukan');
+        }
+        // Toggle status
+        const newStatus = admin.status === 'Aktif' ? 'Tidak Aktif' : 'Aktif';
+        await adminModel.update(adminId, {
+            username: admin.username,
+            nama: admin.nama,
+            foto: admin.foto,
+            status: newStatus
+        });
+        res.redirect('/admin/users?success=Status admin berhasil diubah');
+    } catch (error) {
+        console.error('Error in toggleStatus:', error);
+        res.redirect('/admin/users?error=Gagal mengubah status admin');
+    }
+};
 const adminModel = require('../models/adminModel');
 const hashHelper = require('../utils/hashHelper');
 const multer = require('multer');
@@ -280,9 +302,11 @@ exports.detail = async (req, res) => {
         if (!user) {
             return res.redirect('/admin/users?error=Admin tidak ditemukan');
         }
-
+        // Ambil semua admin untuk sidebar
+        const usersList = await adminModel.getAll();
         res.render('admin/user/userDetail', { 
             user,
+            usersList,
             currentPath: req.path 
         });
     } catch (error) {

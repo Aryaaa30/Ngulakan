@@ -5,152 +5,116 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 relative">
     <%- include('../../partials/navbar') %>
 
-    <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Detail Struktur Padukuhan</h2>
-            <div class="flex space-x-2">
-                <a href="/admin/struktur/edit/<%= struktur.id_struktur %>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                    Edit
-                </a>
-                <a href="/admin/struktur" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-                    Kembali
-                </a>
+    <div class="max-w-7xl mx-auto mt-8 flex flex-col lg:flex-row gap-8 px-4">
+        <!-- Kiri: Detail -->
+        <div class="flex-1 bg-white rounded shadow p-6">
+            <% if (struktur.foto) { %>
+                <img 
+                    src="/uploads/foto/struktur/<%= struktur.foto %>" 
+                    alt="Foto <%= struktur.nama %>" 
+                    class="w-full h-64 object-cover rounded mb-6 shadow cursor-pointer"
+                    onclick="bukaModal('/uploads/foto/struktur/<%= struktur.foto %>')"
+                >
+            <% } else { %>
+                <div class="w-full h-64 bg-gray-300 rounded mb-6 flex items-center justify-center">
+                    <i class="fas fa-user text-6xl text-gray-600"></i>
+                </div>
+            <% } %>
+
+            <h2 class="text-3xl font-bold mb-6">
+                <%= struktur.nama %>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 mb-6">
+                <!-- Jabatan -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">🏷️</div>
+                    <div>
+                        <p class="font-semibold">Jabatan</p>
+                        <span class="px-2 py-1 bg-blue-500 text-white rounded text-xs">
+                            <%= struktur.jabatan %>
+                        </span>
+                    </div>
+                </div>
+                <!-- Kontak -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📞</div>
+                    <div>
+                        <p class="font-semibold">Kontak</p>
+                        <% if (struktur.kontak) { %>
+                            <a href="tel:<%= struktur.kontak %>" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-phone mr-1"></i><%= struktur.kontak %>
+                            </a>
+                        <% } else { %>
+                            <span class="text-gray-400">-</span>
+                        <% } %>
+                    </div>
+                </div>
+                <!-- Kolom tanggal dibuat & update dihapus sesuai permintaan -->
+            </div>
+
+            <!-- Aksi -->
+            <div class="flex gap-4">
+                <a href="/admin/struktur/edit/<%= struktur.id_struktur %>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
+                <a href="/admin/struktur" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Kembali</a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-1">
-                <div class="bg-white border rounded-lg p-6 text-center">
-                    <% if (struktur.foto) { %>
-                        <img src="/uploads/foto/struktur/<%= struktur.foto %>" 
-                             alt="Foto <%= struktur.nama %>" 
-                             class="w-full h-64 object-cover rounded mb-4">
-                    <% } else { %>
-                        <div class="w-full h-64 bg-gray-300 rounded mb-4 flex items-center justify-center">
-                            <i class="fas fa-user text-6xl text-gray-600"></i>
-                        </div>
-                    <% } %>
-                    <h3 class="text-xl font-bold mb-2"><%= struktur.nama %></h3>
-                    <span class="px-3 py-1 bg-blue-500 text-white rounded-full text-sm">
-                        <%= struktur.jabatan %>
-                    </span>
-                </div>
+        <!-- Kanan: Daftar Struktur Lainnya -->
+        <div class="w-full lg:w-80 flex flex-col gap-2">
+            <div class="mb-2">
+                <h3 class="text-lg font-bold text-gray-700">Struktur Lainnya</h3>
+                <p class="text-xs text-gray-500">Scroll ke bawah untuk melihat semua struktur</p>
             </div>
-            
-            <div class="md:col-span-2">
-                <div class="bg-white border rounded-lg p-6">
-                    <h3 class="text-lg font-bold mb-4">Informasi Struktur</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">ID Struktur:</dt>
-                                    <dd class="text-sm text-gray-900"><%= struktur.id_struktur %></dd>
-                                </div>
-                                
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Nama:</dt>
-                                    <dd class="text-sm text-gray-900"><%= struktur.nama %></dd>
-                                </div>
-                                
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Jabatan:</dt>
-                                    <dd class="text-sm">
-                                        <span class="px-2 py-1 bg-blue-500 text-white rounded text-xs">
-                                            <%= struktur.jabatan %>
-                                        </span>
-                                    </dd>
-                                </div>
-                            </dl>
+
+            <div class="w-full h-[690px] overflow-y-auto flex flex-col gap-4 pr-1">
+                <% strukturList.forEach(item => { if (item.id_struktur !== struktur.id_struktur) { %>
+                <a href="/admin/struktur/<%= item.id_struktur %>" class="flex items-start bg-white rounded shadow p-4 hover:bg-blue-50 transition">
+                    <% if (item.foto) { %>
+                        <img src="/uploads/foto/struktur/<%= item.foto %>" alt="Foto Struktur" class="w-16 h-16 object-cover rounded mr-4">
+                    <% } else { %>
+                        <div class="w-16 h-16 bg-gray-200 rounded mr-4 flex items-center justify-center text-gray-400 text-sm">No Image</div>
+                    <% } %>
+                    <div class="flex-1 text-sm text-gray-700">
+                        <div class="flex items-center gap-2 font-semibold text-md mb-1">
+                            <%= item.nama %>
                         </div>
-                        
-                        <div>
-                            <dl class="space-y-3">
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Kontak:</dt>
-                                    <dd class="text-sm">
-                                        <% if (struktur.kontak) { %>
-                                            <a href="tel:<%= struktur.kontak %>" class="text-blue-600 hover:text-blue-800">
-                                                <i class="fas fa-phone mr-1"></i><%= struktur.kontak %>
-                                            </a>
-                                        <% } else { %>
-                                            <span class="text-gray-400">-</span>
-                                        <% } %>
-                                    </dd>
-                                </div>
-                                
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Dibuat:</dt>
-                                    <dd class="text-sm text-gray-900">
-                                        <%= new Date(struktur.created_at).toLocaleString('id-ID') %>
-                                    </dd>
-                                </div>
-                                
-                                <div>
-                                    <dt class="text-sm font-medium text-gray-500">Diupdate:</dt>
-                                    <dd class="text-sm text-gray-900">
-                                        <%= new Date(struktur.updated_at).toLocaleString('id-ID') %>
-                                    </dd>
-                                </div>
-                            </dl>
+                        <div class="flex items-center gap-2 mb-1 text-gray-600">
+                            <span class="text-xs">🏷️</span>
+                            <%= item.jabatan %>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1 text-gray-600">
+                            <span class="text-xs">📞</span>
+                            <%= item.kontak || '-' %>
                         </div>
                     </div>
-                </div>
-                
-                <div class="bg-white border rounded-lg p-6 mt-4">
-                    <h3 class="text-lg font-bold mb-4">Aksi</h3>
-                    <div class="flex space-x-2">
-                        <a href="/admin/struktur/edit/<%= struktur.id_struktur %>" 
-                           class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                            Edit Struktur
-                        </a>
-                        <button onclick="confirmDelete(<%= struktur.id_struktur %>, '<%= struktur.nama %>')"
-                                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                            Hapus Struktur
-                        </button>
-                        <a href="/admin/struktur" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                            Kembali ke Daftar
-                        </a>
-                    </div>
-                </div>
+                </a>
+                <% } }) %>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-            <h3 class="text-lg font-bold mb-4">Konfirmasi Hapus</h3>
-            <p class="mb-4">Apakah Anda yakin ingin menghapus struktur <strong id="deleteName"></strong>?</p>
-            <p class="text-red-600 text-sm mb-4">Tindakan ini tidak dapat dibatalkan.</p>
-            <div class="flex justify-end space-x-2">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                    Batal
-                </button>
-                <form id="deleteForm" method="POST" class="inline">
-                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                        Hapus
-                    </button>
-                </form>
-            </div>
-        </div>
+    <!-- Modal Gambar Fullscreen -->
+    <div id="modalGambar" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden items-center justify-center">
+        <button onclick="tutupModal()" class="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400">×</button>
+        <img id="modalImg" src="" alt="Gambar Besar" class="max-w-full max-h-[90vh] rounded shadow-xl border-4 border-white">
     </div>
 
     <script>
-        function confirmDelete(id, name) {
-            document.getElementById('deleteName').textContent = name;
-            document.getElementById('deleteForm').action = `/admin/struktur/hapus/${id}`;
-            document.getElementById('deleteModal').classList.remove('hidden');
-            document.getElementById('deleteModal').classList.add('flex');
+        // Modal handler
+        function bukaModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('modalGambar').classList.remove('hidden');
+            document.getElementById('modalGambar').classList.add('flex');
         }
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
-            document.getElementById('deleteModal').classList.remove('flex');
+        function tutupModal() {
+            document.getElementById('modalGambar').classList.remove('flex');
+            document.getElementById('modalGambar').classList.add('hidden');
+            document.getElementById('modalImg').src = '';
         }
     </script>
-</body>
-</html> 
+...existing code...
