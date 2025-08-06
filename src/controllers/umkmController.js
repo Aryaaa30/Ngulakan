@@ -1,3 +1,26 @@
+// Public: List UMKM
+exports.publicList = async (req, res) => {
+  try {
+    const umkm = await umkmModel.getAll();
+    res.render('public/umkm/umkmListPublic', { umkm });
+  } catch (error) {
+    res.status(500).render('public/umkm/umkmListPublic', { umkm: [], error: 'Gagal memuat daftar UMKM' });
+  }
+};
+
+// Public: Detail UMKM
+exports.publicDetail = async (req, res) => {
+  try {
+    const umkm = await umkmModel.getById(req.params.id);
+    if (!umkm) {
+      return res.redirect('/umkm?error=UMKM tidak ditemukan');
+    }
+    const umkmList = await umkmModel.getAll();
+    res.render('public/umkm/umkmDetailPublic', { umkm, umkmList });
+  } catch (error) {
+    res.redirect('/umkm?error=Gagal memuat detail UMKM');
+  }
+};
 // Toggle status Aktif/Tidak Aktif
 exports.toggleStatus = async (req, res) => {
   try {

@@ -1,3 +1,26 @@
+// Public: List kegiatan
+exports.publicList = async (req, res) => {
+  try {
+    const kegiatan = await kegiatanModel.getAll();
+    res.render('public/kegiatan/kegiatanListPublic', { kegiatan });
+  } catch (error) {
+    res.status(500).render('public/kegiatan/kegiatanListPublic', { kegiatan: [], error: 'Gagal memuat daftar kegiatan' });
+  }
+};
+
+// Public: Detail kegiatan
+exports.publicDetail = async (req, res) => {
+  try {
+    const kegiatan = await kegiatanModel.getById(req.params.id);
+    if (!kegiatan) {
+      return res.redirect('/kegiatan?error=Kegiatan tidak ditemukan');
+    }
+    const kegiatanList = await kegiatanModel.getAll();
+    res.render('public/kegiatan/kegiatanDetailPublic', { kegiatan, kegiatanList });
+  } catch (error) {
+    res.redirect('/kegiatan?error=Gagal memuat detail kegiatan');
+  }
+};
 const kegiatanModel = require('../models/kegiatanModel');
 const path = require('path');
 const multer = require('multer');

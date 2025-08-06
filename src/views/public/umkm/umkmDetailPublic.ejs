@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detail UMKM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-7xl mx-auto mt-8 flex flex-col lg:flex-row gap-8 px-4">
+        <!-- Kiri: Detail -->
+        <div class="flex-1 bg-white rounded shadow p-6">
+            <% if (umkm.foto) { %>
+                <img 
+                    src="/uploads/foto/umkm/<%= umkm.foto %>" 
+                    alt="Foto UMKM" 
+                    class="w-full h-64 object-cover rounded mb-6 shadow cursor-pointer"
+                    onclick="bukaModal('/uploads/foto/umkm/<%= umkm.foto %>')"
+                >
+            <% } else { %>
+                <div class="w-full h-64 bg-gray-300 rounded mb-6 flex items-center justify-center">
+                    <i class="fas fa-store text-6xl text-gray-600"></i>
+                </div>
+            <% } %>
+
+            <h2 class="text-3xl font-bold mb-6">
+                <%= umkm.nama_umkm %>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 mb-6">
+                <!-- Kategori -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">🏷️</div>
+                    <div>
+                        <p class="font-semibold">Kategori</p>
+                        <p><%= umkm.kategori_umkm %></p>
+                    </div>
+                </div>
+                <!-- Status -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📌</div>
+                    <div>
+                        <p class="font-semibold">Status</p>
+                        <p><%= umkm.status %></p>
+                    </div>
+                </div>
+                <!-- Nama Pemilik -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">👤</div>
+                    <div>
+                        <p class="font-semibold">Nama Pemilik</p>
+                        <p><%= umkm.nama_pemilik %></p>
+                    </div>
+                </div>
+                <!-- Kontak -->
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📞</div>
+                    <div>
+                        <p class="font-semibold">Kontak</p>
+                        <% if (umkm.kontak) { %>
+                            <a href="tel:<%= umkm.kontak %>" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-phone mr-1"></i><%= umkm.kontak %>
+                            </a>
+                        <% } else { %>
+                            <span class="text-gray-400">-</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alamat -->
+            <div class="mb-6 text-gray-700">
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📍</div>
+                    <div>
+                        <p class="font-semibold mb-1">Alamat</p>
+                        <p><%= umkm.alamat %></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deskripsi -->
+            <% if (umkm.deskripsi) { %>
+            <div class="mb-6 text-gray-700">
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl mt-1">📝</div>
+                    <div>
+                        <p class="font-semibold mb-1">Deskripsi</p>
+                        <p><%= umkm.deskripsi %></p>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- Aksi -->
+            <div class="flex gap-4">
+                <a href="/umkm" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Kembali</a>
+            </div>
+        </div>
+
+        <!-- Kanan: Daftar UMKM Lainnya -->
+        <div class="w-full lg:w-80 flex flex-col gap-2">
+            <div class="mb-2">
+                <h3 class="text-lg font-bold text-gray-700">UMKM Lainnya</h3>
+                <p class="text-xs text-gray-500">Scroll ke bawah untuk melihat semua UMKM</p>
+            </div>
+
+            <div class="w-full h-[690px] overflow-y-auto flex flex-col gap-4 pr-1">
+                <% umkmList.forEach(item => { if (item.id_umkm !== umkm.id_umkm) { %>
+                <a href="/umkm/detail/<%= item.id_umkm %>" class="flex items-start bg-white rounded shadow p-4 hover:bg-blue-50 transition">
+                    <% if (item.foto) { %>
+                        <img src="/uploads/foto/umkm/<%= item.foto %>" alt="Foto UMKM" class="w-16 h-16 object-cover rounded mr-4">
+                    <% } else { %>
+                        <div class="w-16 h-16 bg-gray-200 rounded mr-4 flex items-center justify-center text-gray-400 text-sm">No Image</div>
+                    <% } %>
+                    <div class="flex-1 text-sm text-gray-700">
+                        <div class="flex items-center gap-2 font-semibold text-md mb-1">
+                            <%= item.nama_umkm %>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1 text-gray-600">
+                            <span class="text-xs">👤</span>
+                            <%= item.nama_pemilik %>
+                        </div>
+                        <div class="flex items-center gap-2 mb-1 text-gray-400 text-xs">
+                            <span class="text-xs">📍</span>
+                            <%= item.alamat %>
+                        </div>
+                    </div>
+                </a>
+                <% } }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gambar Fullscreen -->
+    <div id="modalGambar" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden items-center justify-center">
+        <button onclick="tutupModal()" class="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400">×</button>
+        <img id="modalImg" src="" alt="Gambar Besar" class="max-w-full max-h-[90vh] rounded shadow-xl border-4 border-white">
+    </div>
+
+    <script>
+        // Modal handler
+        function bukaModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('modalGambar').classList.remove('hidden');
+            document.getElementById('modalGambar').classList.add('flex');
+        }
+
+        function tutupModal() {
+            document.getElementById('modalGambar').classList.remove('flex');
+            document.getElementById('modalGambar').classList.add('hidden');
+            document.getElementById('modalImg').src = '';
+        }
+
+        function confirmDelete(id, name) {
+            document.getElementById('deleteName').textContent = name;
+            document.getElementById('deleteForm').action = `/admin/umkm/hapus/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+        }
+    </script>
+
+</body>
+</html> 

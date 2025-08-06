@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar UMKM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Daftar UMKM</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+            <input type="text" id="filterNama" oninput="filterTabel()" placeholder="Cari Nama UMKM" class="border px-3 py-2 rounded" />
+            <input type="text" id="filterPemilik" oninput="filterTabel()" placeholder="Cari Nama Pemilik" class="border px-3 py-2 rounded" />
+            <input type="text" id="filterAlamat" oninput="filterTabel()" placeholder="Cari Alamat" class="border px-3 py-2 rounded" />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="filterKontak" oninput="filterTabel()" placeholder="Cari Kontak" class="border px-3 py-2 rounded" />
+            <select id="filterKategori" onchange="filterTabel()" class="border px-3 py-2 rounded">
+                <option value="semua">Semua Kategori</option>
+                <option value="Makanan">Makanan</option>
+                <option value="Tekstil">Tekstil</option>
+                <option value="Aksesoris">Aksesoris</option>
+                <option value="Kerajinan">Kerajinan</option>
+                <option value="Jasa">Jasa</option>
+                <option value="Pertanian">Pertanian</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            <select id="filterStatus" onchange="filterTabel()" class="border px-3 py-2 rounded">
+                <option value="semua">Semua Status</option>
+                <option value="Aktif">Aktif</option>
+                <option value="Tidak Aktif">Tidak Aktif</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <button onclick="resetFilter()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Reset Filter</button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table id="tabelUmkm" class="min-w-full table-auto border text-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="px-4 py-2 border">No</th>
+                        <th class="px-4 py-2 border">Foto</th>
+                        <th class="px-4 py-2 border">Nama UMKM</th>
+                        <th class="px-4 py-2 border">Kategori</th>
+                        <th class="px-4 py-2 border">Nama Pemilik</th>
+                        <th class="px-4 py-2 border">Alamat</th>
+                        <th class="px-4 py-2 border">Kontak</th>
+                        <th class="px-4 py-2 border">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (umkm && umkm.length > 0) { %>
+                        <% umkm.forEach((item, index) => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 border"><%= index + 1 %></td>
+                                <td class="px-4 py-2 border">
+                                    <% if (item.foto) { %>
+                                        <img src="/uploads/foto/umkm/<%= item.foto %>" 
+                                             alt="Foto <%= item.nama_umkm %>" 
+                                             class="w-12 h-12 object-cover rounded">
+                                    <% } else { %>
+                                        <div class="w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
+                                            <i class="fas fa-store text-gray-600"></i>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 border" data-nama>
+                                    <a href="/umkm/detail/<%= item.id_umkm %>" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                                        <%= item.nama_umkm %>
+                                    </a>
+                                </td>
+                                <td class="px-4 py-2 border" data-kategori>
+                                    <% let kategoriColor = 'bg-gray-400';
+                                    if (item.kategori_umkm === 'Makanan') {
+                                        kategoriColor = 'bg-yellow-500';
+                                    } else if (item.kategori_umkm === 'Tekstil') {
+                                        kategoriColor = 'bg-blue-500';
+                                    } else if (item.kategori_umkm === 'Aksesoris') {
+                                        kategoriColor = 'bg-pink-500';
+                                    } else if (item.kategori_umkm === 'Kerajinan') {
+                                        kategoriColor = 'bg-purple-500';
+                                    } else if (item.kategori_umkm === 'Jasa') {
+                                        kategoriColor = 'bg-teal-500';
+                                    } else if (item.kategori_umkm === 'Pertanian') {
+                                        kategoriColor = 'bg-green-600';
+                                    } else if (item.kategori_umkm === 'Lainnya') {
+                                        kategoriColor = 'bg-gray-500';
+                                    }
+                                    %>
+                                    <span class="px-2 py-1 <%= kategoriColor %> text-white rounded text-xs">
+                                        <%= item.kategori_umkm %>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 border" data-pemilik><%= item.nama_pemilik %></td>
+                                <td class="px-4 py-2 border" data-alamat><%= item.alamat %></td>
+                                <td class="px-4 py-2 border" data-kontak>
+                                    <% if (item.kontak) { %>
+                                        <a href="tel:<%= item.kontak %>" class="text-blue-600 hover:text-blue-800">
+                                            <i class="fas fa-phone mr-1"></i><%= item.kontak %>
+                                        </a>
+                                    <% } else { %>
+                                        <span class="text-gray-400">-</span>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 border" data-status>
+                                    <span class="px-2 py-1 rounded text-xs <%= item.status === 'Aktif' ? 'bg-green-500 text-white' : 'bg-red-500 text-white' %>">
+                                        <%= item.status %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <br>Tidak ada data UMKM
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filterTabel() {
+            const nama = document.getElementById('filterNama').value.toLowerCase();
+            const pemilik = document.getElementById('filterPemilik').value.toLowerCase();
+            const alamat = document.getElementById('filterAlamat').value.toLowerCase();
+            const kontak = document.getElementById('filterKontak').value.toLowerCase();
+            const kategori = document.getElementById('filterKategori').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#tabelUmkm tbody tr');
+            rows.forEach(row => {
+                // Skip empty message row
+                if (row.querySelector('td[colspan]')) {
+                    return;
+                }
+
+                const namaText = row.querySelector('[data-nama] a').textContent.trim().toLowerCase();
+                const pemilikText = row.querySelector('[data-pemilik]').textContent.trim().toLowerCase();
+                const alamatText = row.querySelector('[data-alamat]').textContent.trim().toLowerCase();
+                const kontakText = row.querySelector('[data-kontak]') ? row.querySelector('[data-kontak]').textContent.trim().toLowerCase() : '';
+                const kategoriText = row.querySelector('[data-kategori] span').textContent.trim().toLowerCase();
+                const statusText = row.querySelector('[data-status] span').textContent.trim().toLowerCase();
+
+                const cocok =
+                    (nama === '' || namaText.includes(nama)) &&
+                    (pemilik === '' || pemilikText.includes(pemilik)) &&
+                    (alamat === '' || alamatText.includes(alamat)) &&
+                    (kontak === '' || kontakText.includes(kontak)) &&
+                    (kategori === 'semua' || kategoriText === kategori) &&
+                    (status === 'semua' || statusText === status);
+
+                row.style.display = cocok ? '' : 'none';
+            });
+
+            // Update empty message if needed
+            updateEmptyMessage();
+        }
+
+        function updateEmptyMessage() {
+            const visibleRows = document.querySelectorAll('#tabelUmkm tbody tr:not([style*="display: none"])');
+            const emptyRow = document.querySelector('#tabelUmkm tbody tr td[colspan]');
+            
+            if (visibleRows.length === 0 && emptyRow) {
+                emptyRow.parentElement.style.display = '';
+                emptyRow.innerHTML = '<i class="fas fa-inbox text-4xl mb-2"></i><br>Tidak ada UMKM yang sesuai dengan filter.';
+            } else if (emptyRow) {
+                emptyRow.parentElement.style.display = 'none';
+            }
+        }
+
+        function resetFilter() {
+            document.getElementById('filterNama').value = '';
+            document.getElementById('filterPemilik').value = '';
+            document.getElementById('filterAlamat').value = '';
+            document.getElementById('filterKontak').value = '';
+            document.getElementById('filterKategori').value = 'semua';
+            document.getElementById('filterStatus').value = 'semua';
+            filterTabel();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.bg-red-100, .bg-green-100');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
+
+            // Initialize filter
+            filterTabel();
+        });
+    </script>
+</body>
+</html>

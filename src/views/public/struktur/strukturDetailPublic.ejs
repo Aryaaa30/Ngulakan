@@ -58,8 +58,7 @@
 
             <!-- Aksi -->
             <div class="flex gap-4">
-                <a href="/admin/struktur/edit/<%= struktur.id_struktur %>" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Edit</a>
-                <a href="/admin/struktur" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Kembali</a>
+                <a href="/struktur" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Kembali</a>
             </div>
         </div>
 
@@ -72,7 +71,7 @@
 
             <div class="w-full h-[690px] overflow-y-auto flex flex-col gap-4 pr-1">
                 <% strukturList.forEach(item => { if (item.id_struktur !== struktur.id_struktur) { %>
-                <a href="/admin/struktur/detail/<%= item.id_struktur %>" class="flex items-start bg-white rounded shadow p-4 hover:bg-blue-50 transition">
+                <a href="/struktur/detail/<%= item.id_struktur %>" class="flex items-start bg-white rounded shadow p-4 hover:bg-blue-50 transition">
                     <% if (item.foto) { %>
                         <img src="/uploads/foto/struktur/<%= item.foto %>" alt="Foto Struktur" class="w-16 h-16 object-cover rounded mr-4">
                     <% } else { %>

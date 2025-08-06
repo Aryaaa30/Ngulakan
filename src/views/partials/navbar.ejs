@@ -14,6 +14,10 @@
             <li><a href="/" class="hover:text-blue-400">Dashboard Public</a></li>
             <li><a href="/berkas" class="hover:text-blue-400">Berkas</a></li>
             <li><a href="/components" class="hover:text-blue-400">Components</a></li>
+            <li><a href="/pengumuman" class="hover:text-blue-400 <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/pengumuman')) ? 'text-blue-400' : '' %>">Pengumuman</a></li>
+            <li><a href="/kegiatan" class="hover:text-blue-400 <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/kegiatan')) ? 'text-blue-400' : '' %>">Kegiatan</a></li>
+            <li><a href="/umkm" class="hover:text-blue-400 <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/umkm')) ? 'text-blue-400' : '' %>">UMKM</a></li>
+            <li><a href="/struktur" class="hover:text-blue-400 <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/struktur')) ? 'text-blue-400' : '' %>">Struktur</a></li>
             <li><a href="/login" class="hover:text-blue-400">Login Admin</a></li>
         <% } %>
     </ul>

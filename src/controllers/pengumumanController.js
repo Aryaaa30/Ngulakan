@@ -1,3 +1,38 @@
+// Public: List pengumuman
+exports.publicList = async (req, res) => {
+  try {
+    const pengumuman = await pengumumanModel.getAll();
+    res.render('public/pengumuman/pengumumanListPublic', { pengumuman });
+  } catch (error) {
+    res.status(500).render('public/pengumuman/pengumumanListPublic', { pengumuman: [], error: 'Gagal memuat daftar pengumuman' });
+  }
+};
+
+// Public: Detail pengumuman
+exports.publicDetail = async (req, res) => {
+  try {
+    const pengumuman = await pengumumanModel.getById(req.params.id);
+    if (!pengumuman) {
+      return res.redirect('/pengumuman?error=Pengumuman tidak ditemukan');
+    }
+    let kegiatanUtama = null;
+    if (pengumuman && pengumuman.id_kegiatan_desa) {
+      kegiatanUtama = await kegiatanModel.getById(pengumuman.id_kegiatan_desa);
+    }
+    // Ambil semua pengumuman untuk bagian pengumuman lainnya
+    const pengumumanList = await pengumumanModel.getAll();
+    // Ambil semua kegiatan desa untuk mapping di pengumuman lainnya
+    const kegiatanDesaList = await kegiatanModel.getAll();
+    res.render('public/pengumuman/pengumumanDetailPublic', {
+      pengumuman,
+      kegiatanUtama,
+      pengumumanList,
+      kegiatanDesaList
+    });
+  } catch (error) {
+    res.redirect('/pengumuman?error=Gagal memuat detail pengumuman');
+  }
+};
 const pengumumanModel = require('../models/pengumumanModel');
 const kegiatanModel = require('../models/kegiatanModel');
 

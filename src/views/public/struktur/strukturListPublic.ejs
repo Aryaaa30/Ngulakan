@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Struktur Padukuhan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/navbar') %>
+
+    <div class="max-w-6xl mx-auto mt-8 p-8 bg-white rounded shadow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Daftar Struktur Padukuhan</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <input type="text" id="filterNama" oninput="filterTabel()" placeholder="Cari Nama Struktur" class="border px-3 py-2 rounded" />
+            <select id="filterJabatan" onchange="filterTabel()" class="border px-3 py-2 rounded">
+                <option value="semua">Semua Jabatan</option>
+                <option value="dukuh">Dukuh</option>
+                <option value="ketua rt">Ketua RT</option>
+                <option value="ketua rw">Ketua RW</option>
+            </select>
+            <input type="text" id="filterKontak" oninput="filterTabel()" placeholder="Cari Kontak" class="border px-3 py-2 rounded" />
+        </div>
+        <div class="mb-4">
+            <button onclick="resetFilter()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Reset Filter</button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table id="tabelStruktur" class="min-w-full table-auto border text-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="px-4 py-2 border">No</th>
+                        <th class="px-4 py-2 border">Foto</th>
+                        <th class="px-4 py-2 border">Nama</th>
+                        <th class="px-4 py-2 border">Jabatan</th>
+                        <th class="px-4 py-2 border">Kontak</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (struktur && struktur.length > 0) { %>
+                        <% struktur.forEach((item, index) => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 border"><%= index + 1 %></td>
+                                <td class="px-4 py-2 border">
+                                    <% if (item.foto) { %>
+                                        <img src="/uploads/foto/struktur/<%= item.foto %>" 
+                                             alt="Foto <%= item.nama %>" 
+                                             class="w-12 h-12 object-cover rounded">
+                                    <% } else { %>
+                                        <div class="w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
+                                            <i class="fas fa-user text-gray-600"></i>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td class="px-4 py-2 border" data-nama>
+                                    <a href="/struktur/detail/<%= item.id_struktur %>" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                                        <%= item.nama %>
+                                    </a>
+                                </td>
+                                <td class="px-4 py-2 border" data-jabatan>
+                                    <% let jabatanColor = 'bg-gray-400';
+                                    if (item.jabatan.toLowerCase() === 'dukuh') {
+                                        jabatanColor = 'bg-green-600';
+                                    } else if (item.jabatan.toLowerCase() === 'ketua rt') {
+                                        jabatanColor = 'bg-yellow-500';
+                                    } else if (item.jabatan.toLowerCase() === 'ketua rw') {
+                                        jabatanColor = 'bg-blue-500';
+                                    } else if (item.jabatan.toLowerCase() === 'sekretaris') {
+                                        jabatanColor = 'bg-purple-500';
+                                    } else if (item.jabatan.toLowerCase() === 'bendahara') {
+                                        jabatanColor = 'bg-pink-500';
+                                    } else if (item.jabatan.toLowerCase() === 'anggota') {
+                                        jabatanColor = 'bg-teal-500';
+                                    }
+                                    %>
+                                    <span class="px-2 py-1 <%= jabatanColor %> text-white rounded text-xs">
+                                        <%= item.jabatan %>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 border" data-kontak>
+                                    <% if (item.kontak) { %>
+                                        <a href="tel:<%= item.kontak %>" class="text-blue-600 hover:text-blue-800">
+                                            <i class="fas fa-phone mr-1"></i><%= item.kontak %>
+                                        </a>
+                                    <% } else { %>
+                                        <span class="text-gray-400">-</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl mb-2"></i>
+                                <br>Tidak ada data struktur
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filterTabel() {
+            const nama = document.getElementById('filterNama').value.toLowerCase();
+            const jabatan = document.getElementById('filterJabatan').value.toLowerCase();
+            const kontak = document.getElementById('filterKontak').value.toLowerCase();
+
+            const rows = document.querySelectorAll('#tabelStruktur tbody tr');
+            rows.forEach(row => {
+                // Skip empty message row
+                if (row.querySelector('td[colspan]')) {
+                    return;
+                }
+
+                const namaText = row.querySelector('[data-nama] a').textContent.trim().toLowerCase();
+                const jabatanText = row.querySelector('[data-jabatan] span').textContent.trim().toLowerCase();
+                const kontakText = row.querySelector('[data-kontak]')?.textContent.trim().toLowerCase() || '';
+
+                const cocok =
+                    (nama === '' || namaText.includes(nama)) &&
+                    (jabatan === 'semua' || jabatanText === jabatan) &&
+                    (kontak === '' || kontakText.includes(kontak));
+
+                row.style.display = cocok ? '' : 'none';
+            });
+
+            // Update empty message if needed
+            updateEmptyMessage();
+        }
+
+        function updateEmptyMessage() {
+            const visibleRows = document.querySelectorAll('#tabelStruktur tbody tr:not([style*="display: none"])');
+            const emptyRow = document.querySelector('#tabelStruktur tbody tr td[colspan]');
+            
+            if (visibleRows.length === 0 && emptyRow) {
+                emptyRow.parentElement.style.display = '';
+                emptyRow.innerHTML = '<i class="fas fa-inbox text-4xl mb-2"></i><br>Tidak ada struktur yang sesuai dengan filter.';
+            } else if (emptyRow) {
+                emptyRow.parentElement.style.display = 'none';
+            }
+        }
+
+        function resetFilter() {
+            document.getElementById('filterNama').value = '';
+            document.getElementById('filterJabatan').value = 'semua';
+            document.getElementById('filterKontak').value = '';
+            filterTabel();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.bg-red-100, .bg-green-100');
+                alerts.forEach(function(alert) {
+                    alert.style.display = 'none';
+                });
+            }, 5000);
+
+            // Initialize filter
+            filterTabel();
+        });
+    </script>
+</body>
+</html>

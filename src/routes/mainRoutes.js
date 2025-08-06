@@ -36,4 +36,23 @@ router.get('/components/:id', (req, res) => {
     }
 });
 
+// Public routes for Pengumuman
+router.get('/pengumuman', require('../controllers/pengumumanController').publicList);
+
+// Route agar detail pengumuman bisa diakses dengan /pengumuman/:id
+router.get('/pengumuman/:id', require('../controllers/pengumumanController').publicDetail);
+router.get('/pengumuman/detail/:id', require('../controllers/pengumumanController').publicDetail);
+
+// Public routes for Kegiatan
+router.get('/kegiatan', require('../controllers/kegiatanController').publicList);
+router.get('/kegiatan/detail/:id', require('../controllers/kegiatanController').publicDetail);
+
+// Public routes for UMKM
+router.get('/umkm', require('../controllers/umkmController').publicList);
+router.get('/umkm/detail/:id', require('../controllers/umkmController').publicDetail);
+
+// Public routes for Struktur
+router.get('/struktur', require('../controllers/strukturController').publicList);
+router.get('/struktur/detail/:id', require('../controllers/strukturController').publicDetail);
+
 module.exports = router;

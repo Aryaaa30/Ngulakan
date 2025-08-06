@@ -1,3 +1,26 @@
+// Public: List struktur
+exports.publicList = async (req, res) => {
+  try {
+    const struktur = await strukturModel.getAll();
+    res.render('public/struktur/strukturListpublic',{ struktur });
+  } catch (error) {
+    res.status(500).render('public/struktur/strukturLispublic', { struktur: [], error: 'Gagal memuat daftar struktur' });
+  }
+};
+
+// Public: Detail struktur
+exports.publicDetail = async (req, res) => {
+  try {
+    const struktur = await strukturModel.getById(req.params.id);
+    if (!struktur) {
+      return res.redirect('/struktur?error=Struktur tidak ditemukan');
+    }
+    const strukturList = await strukturModel.getAll();
+    res.render('public/struktur/strukturDetailPublic', { struktur, strukturList });
+  } catch (error) {
+    res.redirect('/struktur?error=Gagal memuat detail struktur');
+  }
+};
 const strukturModel = require('../models/strukturModel');
 const path = require('path');
 const multer = require('multer');
