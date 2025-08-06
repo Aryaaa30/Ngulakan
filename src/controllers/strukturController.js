@@ -175,11 +175,13 @@ exports.edit = async (req, res) => {
   try {
     const { nama, jabatan, kontak } = req.body;
     const strukturId = req.params.id;
-    let foto = null;
-
-    // Handle file upload
+    let foto;
     if (req.file) {
       foto = req.file.filename;
+    } else {
+      // Ambil foto lama dari database jika tidak upload baru
+      const strukturLama = await strukturModel.getById(strukturId);
+      foto = strukturLama.foto;
     }
 
     // Validation
@@ -200,9 +202,7 @@ exports.edit = async (req, res) => {
     };
 
     // Only update foto if new file is uploaded
-    if (foto) {
-      updateData.foto = foto;
-    }
+    updateData.foto = foto;
 
     await strukturModel.update(strukturId, updateData);
 

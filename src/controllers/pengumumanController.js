@@ -130,9 +130,13 @@ exports.edit = async (req, res) => {
     try {
         const { nama_pengumuman, tanggal_pengumuman, isi_pengumuman, kategori_pengumuman, status_pengumuman, prioritas, id_kegiatan_desa } = req.body;
         const pengumumanId = req.params.id;
-        let foto = null;
+        let foto;
         if (req.file) {
             foto = req.file.filename;
+        } else {
+            // Ambil foto lama dari database jika tidak upload baru
+            const pengumumanLama = await pengumumanModel.getById(pengumumanId);
+            foto = pengumumanLama.foto;
         }
 
         // Validation
@@ -164,9 +168,7 @@ exports.edit = async (req, res) => {
             status_pengumuman: status_pengumuman || 'Draft',
             prioritas: prioritas || 'Normal'
         };
-        if (foto) {
-            updateData.foto = foto;
-        }
+        updateData.foto = foto;
 
         await pengumumanModel.update(pengumumanId, updateData);
 
