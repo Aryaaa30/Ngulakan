@@ -109,7 +109,15 @@ exports.tambah = async (req, res) => {
         deskripsi_kegiatan,
         kategori_kegiatan,
         status_kegiatan
-    } = req.body;
+    } = req.body || {};
+
+    if (!nama_kegiatan) {
+        return res.render('admin/kegiatan/kegiatanTambah', {
+            user: req.session.user,
+            error: 'Nama kegiatan wajib diisi!',
+            currentPath: req.path
+        });
+    }
 
     await kegiatanModel.create({
         nama_kegiatan,
@@ -137,7 +145,8 @@ exports.showEdit = async (req, res) => {
 
 // Menyimpan perubahan data kegiatan
 exports.edit = async (req, res) => {
-    const fotoPath = req.file ? '/uploads/foto/kegiatan/' + req.file.filename : req.body.foto_lama;
+    const foto_lama = (req.body && req.body.foto_lama) ? req.body.foto_lama : '';
+    const fotoPath = req.file ? '/uploads/foto/kegiatan/' + req.file.filename : foto_lama;
     const {
         nama_kegiatan,
         tanggal_kegiatan,
@@ -146,7 +155,7 @@ exports.edit = async (req, res) => {
         deskripsi_kegiatan,
         kategori_kegiatan,
         status_kegiatan
-    } = req.body;
+    } = req.body || {};
 
     await kegiatanModel.update(req.params.id, {
         nama_kegiatan,

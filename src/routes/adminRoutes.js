@@ -23,9 +23,9 @@ router.post('/users/toggle-status/:id', ensureAuthenticated, adminController.tog
 // Kegiatan Management CRUD
 router.get('/kegiatan', ensureAuthenticated, kegiatanController.list);
 router.get('/kegiatan/tambah', ensureAuthenticated, kegiatanController.showTambah);
-router.post('/kegiatan/tambah', ensureAuthenticated, kegiatanController.tambah);
+router.post('/kegiatan/tambah', ensureAuthenticated, kegiatanController.uploadMiddleware, kegiatanController.tambah);
 router.get('/kegiatan/edit/:id', ensureAuthenticated, kegiatanController.showEdit);
-router.post('/kegiatan/edit/:id', ensureAuthenticated, kegiatanController.edit);
+router.post('/kegiatan/edit/:id', ensureAuthenticated, kegiatanController.uploadMiddleware, kegiatanController.edit);
 router.post('/kegiatan/hapus/:id', ensureAuthenticated, kegiatanController.hapus);
 router.get('/kegiatan/:id', ensureAuthenticated, kegiatanController.detail);
 
